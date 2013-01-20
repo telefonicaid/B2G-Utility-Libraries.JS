@@ -3,11 +3,11 @@
  *
  *  Product: Open Web Device
  *
- *  Copyright(c) 2012 Telefónica I+D S.A.U.
+ *  Copyright(c) 2012 Telef√≥nica I+D S.A.U.
  *
  *  LICENSE: Apache 2.0
  *
- *  @author José M. Cantera (jmcf@tid.es)
+ *  @author Jos√© M. Cantera (jmcf@tid.es)
  *
  *  It allows to retrieve a A JSON configuration file
  *
