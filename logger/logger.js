@@ -6,7 +6,7 @@
  *
  *  Copyright(c) 2012 Telefónica I+D S.A.U.
  *
- *  LICENSE: TBD
+ *  LICENSE: Apache 2.0
  *
  *  @author José M. Cantera (jmcf@tid.es)
  *
@@ -30,18 +30,19 @@
  *
 */
 
-var owd = window.owd || {};
+'use strict';
 
-if(!owd.logs) {
+var utils = window.utils || {};
+
+if(!utils.logs) {
   (function() {
-    'use strict';
 
     if(window.MozWebSocket) {
       window.console.log("Mozilla's WebSocket is present")
       window.WebSocket = window.MozWebSocket;
     }
 
-    var logs = owd.logs = {};
+    var logs = utils.logs = {};
 
     function extend(subClass,superClass) {
       var F = function() {};

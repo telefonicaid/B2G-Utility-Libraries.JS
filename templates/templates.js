@@ -28,6 +28,8 @@
  *
 */
 
+'use strict';
+
 var utils = window.utils || {};
 
 if (!utils.templates) {
