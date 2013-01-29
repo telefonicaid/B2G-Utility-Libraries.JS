@@ -7,3 +7,5 @@ Documentation can be found at:
 * https://wikis.tid.es/owd/index.php/JS-Lib_Templates
 * https://wikis.tid.es/owd/index.php/JS-Lib_Logger
 * https://wikis.tid.es/owd/index.php/JS-Lib_Remote_Console
+* https://wikis.tid.es/owd/index.php/JS-Lib_Application_states
+* https://wikis.tid.es/owd/index.php/JS-Lib_Multi_card
