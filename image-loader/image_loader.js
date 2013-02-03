@@ -1,6 +1,16 @@
 'use strict';
 
 if (!window.ImageLoader) {
+
+  /**
+    *  The constructor of the ImageLoader Object
+    *
+    *  @param{String} Selector that defines the scrollable container
+    *
+    *  @param{Object} Selector that defines the list of items that contains
+    *                 the images
+    *
+    */
   var ImageLoader = function ImageLoader(pContainer, pItems) {
     var container, items, itemsSelector, scrollLatency = 100, scrollTimer,
         lastViewTop = 0, itemHeight, total, imgsLoading = 0;
@@ -11,6 +21,11 @@ if (!window.ImageLoader) {
 
     /**
      *  Initializer
+     *
+     *  @param{String} Selector that defines the scrollable container
+     *
+     *  @param{Object} Selector that defines the list of items that contains
+     *                 the images
      *
      */
     function init(pContainer, pItems) {
@@ -26,6 +41,10 @@ if (!window.ImageLoader) {
       load();
     }
 
+    /**
+     *  This function is invoked when we change the list of items
+     *
+     */
     function load() {
       window.clearTimeout(scrollTimer);
       items = container.querySelectorAll(itemsSelector);
@@ -36,6 +55,10 @@ if (!window.ImageLoader) {
       window.setTimeout(update, 0);
     }
 
+    /**
+     *  This function is invoked when the scrollable container is translated
+     *
+     */
     function onScroll() {
       window.clearTimeout(scrollTimer);
       if (imgsLoading > 0) {
@@ -74,7 +97,7 @@ if (!window.ImageLoader) {
     }
 
     /**
-     *  Calculates the set of items are in the current viewport
+     *  Calculates the set of items that are in the current viewport
      *
      */
     function update() {
@@ -120,6 +143,11 @@ if (!window.ImageLoader) {
       }
     } // update
 
+    /**
+     *  This function is public and it should be performed when the list of
+     *  items has changed
+     *
+     */
     this.reload = load;
   };
 }
