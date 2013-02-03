@@ -1,7 +1,8 @@
-if (!InfiniteScroll) {
+'use strict';
 
-  const InfiniteScroll = (function(doc) {
-    'use strict';
+if (!window.InfiniteScroll) {
+
+  var InfiniteScroll = (function(doc) {
 
     // Options by default
     var defaults = {
