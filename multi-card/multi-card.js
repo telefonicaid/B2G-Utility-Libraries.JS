@@ -27,13 +27,13 @@
  *
  */
 
+'use strict';
+
 var owd = window.owd || {};
 
 if(!owd.multiCard) {
 
   (function(doc) {
-    'use strict';
-
     owd.MultiCardHandler = function (container) {
       var currentCard; // Referente to current view
       var cards = {}; // Map of views
