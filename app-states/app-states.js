@@ -34,13 +34,14 @@
  *  </head>
  *
  */
+
+'use strict';
+
 var owd = window.owd || {};
 
 if(!owd.appStates) {
 
   (function(doc) {
-    'use strict';
-
     var AppStates = owd.appStates = {};
 
     // Map {state -> styleSheet}
