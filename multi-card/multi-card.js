@@ -144,21 +144,13 @@ if(!owd.multiCard) {
       }
     }
 
-    var done = false;
-
-    function loaded() {
-      if (!done && doc.readyState !== 'loading') {
-        done = true;
-        window.removeEventListener('DOMContentLoaded', loaded);
-        exec();
-      }
-    }
-
-    if (doc.readyState !== 'loading') {
+    if (doc.readyState === 'complete') {
       exec();
     } else {
-      window.addEventListener('DOMContentLoaded', loaded);
-      window.setTimeout(loaded, 50);
+      window.addEventListener('DOMContentLoaded', function loaded() {
+        window.removeEventListener('DOMContentLoaded', loaded);
+        exec();
+      });
     }
 
     function exec() {
