@@ -1,15 +1,14 @@
 /*
- *  Module: Remote Console.
- *
- *  Implements the Web Socket Server that supports a Remote Console
+ *  Module: Remote Console. Implements the Web Socket Server that supports a
+ *  Remote Console
  *
  *  Product: Open Web Device
  *
  *  Copyright(c) 2012 Telefónica I+D S.A.U.
  *
- *  LICENSE: TBD
+ *  LICENSE: Apache 2.0
  *
- *  @author José M. Cantera (jmcf@tid.es)
+ *  @author Telefonica Digital
  *
  */
 

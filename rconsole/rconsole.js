@@ -5,15 +5,13 @@
  *
  *  Copyright(c) 2012 Telefónica I+D S.A.U.
  *
- *  LICENSE: TBD
+ *  LICENSE: Apache 2.0
  *
- *  @author José M. Cantera (jmcf@tid.es)
+ *  @author Telefonica Digital
  *
  *  This module supports the Remote Console App on the browser
  *
- *
- *
-*/
+ */
 
 var owd = window.owd || {};
 

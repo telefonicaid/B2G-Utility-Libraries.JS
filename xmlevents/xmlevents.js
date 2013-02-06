@@ -7,14 +7,13 @@
  *
  *  LICENSE: Apache 2.0
  *
- *  @author José M. Cantera (jmcf@tid.es)
+ *  @author Telefonica Digital
  *
  *  .defaultAction can be 'cancel' or 'perform' ('perform' by default)
  *
  *  .propagate can be 'continue' or 'stop' ('continue' by default)
  *
  *  .phase can be one of ['bubble','capture','default'] ('default' by default)
- *
  *
  *  @example
  *
@@ -26,13 +25,11 @@
  *              observer="#myContainer" phase="capture"
  *              defaultAction="cancel"  propagate="stop" />
  *
- *
-*/
+ */
 
 'use strict';
 
 var utils = window.utils || {};
-
 
 if(!utils.xmlevents) {
   (function() {

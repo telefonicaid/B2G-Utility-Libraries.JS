@@ -1,13 +1,13 @@
-/*
+/**
  *  Module: Event Bus. It is based on HTML5 window.postMessage
  *
  *  Product: Open Web Device
  *
  *  Copyright(c) 2012 Telefónica I+D S.A.U.
  *
- *  LICENSE: TBD
+ *  LICENSE: Apache 2.0
  *
- *  @author José M. Cantera (jmcf@tid.es)
+ *  @author Telefonica Digital
  *
  *  Event Objects will usually have the following structure
  *
@@ -31,10 +31,10 @@
  *  eventObj.data = { number: '638 883 075' };
  *  utils.events.dispatch('MyBus',eventObj);
  *
- *
-*/
+ */
 
 'use strict';
+
 var utils = window.utils || {};
 
 if(!utils.events) {

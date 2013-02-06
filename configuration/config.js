@@ -7,7 +7,7 @@
  *
  *  LICENSE: Apache 2.0
  *
- *  @author José M. Cantera (jmcf@tid.es)
+ *  @author Telefonica Digital
  *
  *  It allows to retrieve a A JSON configuration file
  *

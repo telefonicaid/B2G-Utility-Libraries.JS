@@ -1,26 +1,15 @@
-/*
- *  Module: Application States.
- *
- *  This module associates stylesheets with application states. Developers should
- *  set the state using the 'date-state' attribute in the <body> element.
- *  Automatically, the platform enable the stylesheet associated with the current
- *  state.
- *
- *  From HTML murkup:
- *    <body data-state="myState">
- *
- *  From Javascript:
- *    document.body.dataset.state = 'myState';
+/**
+ *  Module: Application States
  *
  *  Product: Open Web Device
  *
  *  Copyright(c) 2012 Telefónica I+D S.A.U.
  *
- *  LICENSE: TBD
+ *  LICENSE: Apache 2.0
  *
- *  @author Cristian Rodriguez (crdlc@tid.es)
+ *  @author Telefonica Digital
  *
- * @example (Markup)
+ *  @example (Markup)
  *
  *  <head>
  *    <meta charset="UTF-8">

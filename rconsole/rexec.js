@@ -1,15 +1,13 @@
 /*
  *  Module: Remote Executor based on Web Sockets
  *
- *  The module needs a Web Socket server somewhere
- *
  *  Product: Open Web Device
  *
  *  Copyright(c) 2012 Telefónica I+D S.A.U.
  *
- *  LICENSE: TBD
+ *  LICENSE: Apache 2.0
  *
- *  @author José M. Cantera (jmcf@tid.es)
+ *  @author Telefonica Digital
  *
  *  @example
  *
@@ -21,8 +19,7 @@
  *
  *  PLEASE DO NOT USE IT IN PRODUCTION AS IT OPENS A SEC HOLE
  *
- *
-*/
+ */
 
 var owd = window.owd || {};
 

@@ -7,11 +7,11 @@
  *
  *  LICENSE: Apache 2.0
  *
- *  @author José M. Cantera (jmcf@tid.es)
+ *  @author Telefonica Digital
  *
  *  The module allows to work with HTML templates in client-side JS environments
  *
- * @example
+ *  @example
  *
  *   <ul id="theList">
  *    <li data-template>
@@ -25,8 +25,7 @@
  *   var myObj = { name: 'Nice Name!', contactImg: 'myImg.jpg' };
  *   utils.templates.append('#theList',myObj);
  *
- *
-*/
+ */
 
 'use strict';
 

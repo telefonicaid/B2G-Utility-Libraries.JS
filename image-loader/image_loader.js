@@ -1,3 +1,16 @@
+/**
+ *  Module: Image Loader
+ *
+ *  Product: Open Web Device
+ *
+ *  Copyright(c) 2012 Telef—nica I+D S.A.U.
+ *
+ *  LICENSE: Apache 2.0
+ *
+ *  @author Telefonica Digital
+ *
+ */
+
 'use strict';
 
 if (!window.ImageLoader) {

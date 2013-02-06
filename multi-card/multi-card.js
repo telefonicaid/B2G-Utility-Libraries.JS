@@ -1,18 +1,15 @@
-/*
- *  Module: Multi Card. It is based on CSS3 translations
- *
- *  Stylesheet 'multi-card.css' MUST be included in your application
+/**
+ *  Module: Multi Card
  *
  *  Product: Open Web Device
  *
  *  Copyright(c) 2012 Telefónica I+D S.A.U.
  *
- *  LICENSE: TBD
+ *  LICENSE: Apache 2.0
  *
- *  @author Cristian Rodriguez (crdlc@tid.es)
+ *  @author Telefonica Digital
  *
- * @example (Markup)
- *
+ *  @example (Markup)
  *
  *  <section class="appMain multiCard">
  *   <section id="listCard" data-position="home">
@@ -23,7 +20,7 @@
  *
  *   <section id="detailCard" data-position="right">
  *   </section>
- * </section>
+ *  </section>
  *
  */
 

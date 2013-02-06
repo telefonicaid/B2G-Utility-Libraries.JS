@@ -8,7 +8,7 @@
  *
  *  LICENSE: Apache 2.0
  *
- *  @author José M. Cantera (jmcf@tid.es)
+ *  @author Telefonica Digital
  *
  *  The module defines three kind of objects: Logger, Appender, Layout
  *
@@ -19,16 +19,13 @@
  *  owd.logs.DomAppender writes traces to a HTMLDOMElement
  *  owd.logs.CrossDocAppender writes traces to through parent.postMessage
  *
+ *  @example
  *
- * @example
+ *  var appd = new owd.logs.WebSocketAppender('localhost:8081');
+ *  var logger = new owd.logs.Logger('MyLibrary',appd);
+ *  logger.log('This is a log message!!');
  *
- *   var appd = new owd.logs.WebSocketAppender('localhost:8081');
- *   var logger = new owd.logs.Logger('MyLibrary',appd);
- *   logger.log('This is a log message!!');
- *
- *
- *
-*/
+ */
 
 'use strict';
 

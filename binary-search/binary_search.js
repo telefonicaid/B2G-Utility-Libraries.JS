@@ -7,17 +7,17 @@
  *
  *  LICENSE: Apache 2.0
  *
- *  @author José M. Cantera (jmcf@tid.es)
+ *  @author Telefonica Digital
  *
- * This function performs a binary search over an already sorted array
- * target is the target item to search for
- * array is the sorted array
- * options is an optional object which may contain
- * the start and end position (from, to)
- * an optional arrayField which indicates the object property that contains the
- * comparable item and transform and compare functions
+ *  This function performs a binary search over an already sorted array
+ *  target is the target item to search for
+ *  array is the sorted array
+ *  options is an optional object which may contain
+ *  the start and end position (from, to)
+ *  an optional arrayField which indicates the object property that contains the
+ *  comparable item and transform and compare functions
  *
- * Returns an array with the positions on which the target item was found
+ *  Returns an array with the positions on which the target item was found
  *
  */
 
