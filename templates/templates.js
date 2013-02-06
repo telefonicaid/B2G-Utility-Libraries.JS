@@ -156,26 +156,22 @@ if (!utils.templates) {
      */
     function get(data, path) {
 
-      function _get(data, fields) {
+      function doGet(data, fields) {
         var ret;
         // Base case: goal reached
-        if (!fields.length) {
+        if (fields.length === 0) {
           ret = data;
 
-        // Base case: trying to access undefined or null property
-        } else if (data === null || typeof data === 'undefined') {
-          ret = undefined;
-
         // Recursive case: access the field and look into
-        } else {
+        } else if (data !== null && typeof data !== 'undefined') {
           var field = fields.shift();
-          ret = _get(data[field], fields);
+          ret = doGet(data[field], fields);
         }
         return ret;
       }
 
       var fieldList = path.split('.');
-      return _get(data, fieldList);
+      return doGet(data, fieldList);
     }
 
     /**
