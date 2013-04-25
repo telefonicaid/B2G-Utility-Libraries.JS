@@ -134,23 +134,43 @@ if (!utils.templates) {
      */
     function templateReplace(data) {
       return function(text, property) {
-        var ret;
-        if (property.indexOf('.') === -1) {
-          ret = data[property];
-        } else {
-          with (data) {
-            try {
-              ret = eval(property);
-            }
-            catch (e) { }
-          }
-        }
-
+        var ret = get(data, property);
         if (typeof ret === 'undefined') {
           ret = text;
         }
         return ret;
       }
+    }
+
+    /**
+     *   Look recursively for an object field or subfield.
+     *
+     *   @param {Object} data the object where looking into.
+     *
+     *   @param {String} path dotted (Java-package-like) path to the field
+     *   to be retrieved.
+     *
+     *   @return {AnyType} data into the given field.
+     *
+     */
+    function get(data, path) {
+
+      function doGet(data, fields) {
+        var ret;
+        // Base case: goal reached
+        if (fields.length === 0) {
+          ret = data;
+
+        // Recursive case: access the field and look into
+        } else if (data !== null && typeof data !== 'undefined') {
+          var field = fields.shift();
+          ret = doGet(data[field], fields);
+        }
+        return ret;
+      }
+
+      var fieldList = path.split('.');
+      return doGet(data, fieldList);
     }
 
     /**
