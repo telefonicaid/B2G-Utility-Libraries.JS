@@ -1,0 +1,31 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Templates Tests</title>
+  <link rel="stylesheet" href="../../unit_test/mocha/mocha.css" />
+</head>
+<body>
+  <div id="mocha"></div>
+  <script src="../../unit_test/mocha/mocha.js"></script>
+  <script src="../../unit_test/chai/chai.js"></script>
+
+  <script>mocha.setup('tdd'); window.assert = window.chai.assert;</script>
+  <script src="templates.js"></script>
+  <script src="templates_test.js"></script>
+  <script>
+    mocha.checkLeaks();
+    mocha.globals(['utils', 'assert']);
+    mocha.run();
+  </script>
+
+  <section id="test_section" style="display: none">
+    <ol id="test">
+      <li id="#id#" data-template>#data#</li>
+    </ol>
+
+    <ol id="test2">
+      <li id="#data.id#" data-template>#data.data#</li>
+    </ol>
+  </section>
+</body>
+</html>

@@ -27,7 +27,6 @@
  *
  */
 
-'use strict';
 
 var utils = window.utils || {};
 
@@ -226,7 +225,7 @@ if (!utils.templates) {
              target.appendChild(newElem);
           } else if (mode === 'P') { // Append mode
             if (target.firstChild) {
-              target.insertBefore(newElem, ele.firstChild);
+              target.insertBefore(newElem, target.firstChild);
             } else {
               target.appendChild(newElem);
             }
