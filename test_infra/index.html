@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script>
+      function runTests() {
+        var component = document.querySelector('input').value;
+        if(component && component.length > 0) {
+          window.open('../components/' + component + '/test/' + component + '_test.html');
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <h1>Test Runner</h1>
+    <label>Component: <input name="component" type="text" size="20"></input></label>
+    <button onclick="runTests()">Run Tests</button>
+  </body>
+</html>
