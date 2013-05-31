@@ -84,13 +84,7 @@ if (!utils.templates) {
 
         var evaluation;
         if (condition) {
-          // Condition is evaluated over the object in question
-          with (data) {
-            try {
-              evaluation = eval(condition);
-            }
-            catch (e) { evaluation = false; }
-          }
+          evaluation = get(data, condition);
           if (evaluation) {
             // The rest will be ignored
             total = 1;
@@ -102,12 +96,7 @@ if (!utils.templates) {
           var condition = templates.item(c).dataset.condition;
 
           if (condition) {
-            with (data) {
-              try {
-                 evaluation = eval(condition);
-              }
-              catch (e) { evaluation = false; }
-            }
+            evaluation = get(data, condition);
             if (evaluation) {
               template = templates.item(c);
               break;
@@ -158,12 +147,22 @@ if (!utils.templates) {
         var ret;
         // Base case: goal reached
         if (fields.length === 0) {
-          ret = data;
+          if (typeof data === 'function') {
+            ret = data();
+          }
+          else {
+            ret = data;
+          }
 
         // Recursive case: access the field and look into
         } else if (data !== null && typeof data !== 'undefined') {
           var field = fields.shift();
-          ret = doGet(data[field], fields);
+          if (typeof data[field] === 'function') {
+            ret = doGet(data[field](), fields);
+          }
+          else {
+            ret = doGet(data[field], fields);
+          }
         }
         return ret;
       }
@@ -350,6 +349,6 @@ if (!utils.templates) {
       for (var c = 0; c < total; c++) {
         target.appendChild(templates.item(c));
       }
-    }
+    };
   }) ();
 } // window.templates
