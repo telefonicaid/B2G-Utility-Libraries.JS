@@ -1,0 +1,7 @@
+[submodule "mocha"]
+  path = test_infra/vendor/mocha
+  url = https://github.com/visionmedia/mocha.git 
+
+[submodule "chai"]
+  path = test_infra/vendor/chai
+  url = https://github.com/chaijs/chai.git
