@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Seekbars Tests</title>
+    <link rel="stylesheet" href="../../../test_infra/vendor/mocha/mocha.css">
+
+
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="../../../test_infra/vendor/mocha/mocha.js"></script>
+    <script src="../../../test_infra/vendor/chai/chai.js"></script>
+
+    <script>mocha.setup('tdd'); window.assert = window.chai.assert;</script>
+    <script src="../../../test_infra/pointer.js"></script>
+    <script src="../seekbars.js"></script>
+    <script src="seekbars_test.js"></script>
+    <script>
+      mocha.checkLeaks();
+      mocha.globals(['utils', 'assert']);
+      mocha.run();
+    </script>
+
+    <section id="test_section" style="visibility: hidden"></section>
+  </body>
+</html>
