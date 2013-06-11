@@ -1,0 +1,66 @@
+suite('Test Status ', function() {
+  var status, content;
+
+  suiteSetup(function() {
+    status = document.querySelector('[role="status"]');
+    content = status.querySelector('p');
+  });
+
+  test('The component has been initialized correctly ', function() {
+    assert.equal(document.querySelectorAll('[role="status"]').length, 1);
+    assert.isTrue(status.classList.contains('hidden'));
+    assert.equal(content.textContent, '');
+  });
+
+  test('The component shows text and DOM fragments correctly ', function(done) {
+    window.addEventListener('status-showed', function end() {
+      window.removeEventListener('status-showed', end);
+
+      assert.equal(content.textContent, 'water');
+      assert.isFalse(status.classList.contains('hidden'));
+      assert.isTrue(status.classList.contains('onviewport'));
+
+      utils.status.show('wine');
+      assert.equal(content.textContent, 'wine');
+      assert.isFalse(status.classList.contains('hidden'));
+      assert.isTrue(status.classList.contains('onviewport'));
+
+      var docFragment = document.createDocumentFragment();
+      var banana = document.createTextNode('banana');
+      docFragment.appendChild(banana);
+
+      utils.status.show(docFragment);
+      assert.equal(content.textContent, 'banana');
+      assert.isFalse(status.classList.contains('hidden'));
+      assert.isTrue(status.classList.contains('onviewport'));
+
+      var kiwi = document.createTextNode('kiwi');
+      docFragment.appendChild(kiwi);
+      utils.status.show(docFragment);
+      assert.equal(content.textContent, 'kiwi');
+      assert.isFalse(status.classList.contains('hidden'));
+      assert.isTrue(status.classList.contains('onviewport'));
+
+      done();
+    });
+
+    utils.status.show('water');
+  });
+
+  test('The component is hidden correctly ', function(done) {
+    utils.status.hide();
+
+    window.addEventListener('status-hidden', function end() {
+      window.removeEventListener('status-hidden', end);
+      assert.isTrue(status.classList.contains('hidden'));
+      assert.isFalse(status.classList.contains('onviewport'));
+
+      done();
+    });
+  });
+
+  test('The component has been destroyed correctly ', function() {
+    utils.status.destroy();
+    assert.equal(document.querySelectorAll('[role="status"]').length, 0);
+  });
+});

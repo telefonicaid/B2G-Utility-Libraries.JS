@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>Status</title>
+  <meta name="description" content="Most common used after Multi-Select edit, to confirm user action, and optional provide 'Undo' input">
+  <meta name="target" content="html">
+
+  <link rel="stylesheet" href="../../../gaia-ui-bb/menus_dialogs/status.css">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-size: 62.5%!important;
+      background-color: #fff;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    button {
+      font-size: 2rem;
+      margin: 1rem 10% 1rem 10%;
+      display: block;
+      text-align: center;
+      width: 80%;
+    }
+  </style>
+
+  <script type="text/javascript" src="../status.js"></script>
+  <script type="text/javascript" defer src="app.js"></script>
+</head>
+
+<body>
+  <button id="domfragment">Show DOM Fragment</button>
+  <button id="text">Show text content</button>
+</body>
+</html>
