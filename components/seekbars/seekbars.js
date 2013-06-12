@@ -5,6 +5,12 @@ var utils = this.utils || {};
 
 utils.seekbars = (function() {
 
+  var vendor = (/webkit/i).test(navigator.appVersion) ? 'webkit' :
+               (/firefox/i).test(navigator.userAgent) ? 'Moz' :
+               'opera' in window ? 'O' : '';
+
+  var transformProp = vendor + 'Transform';
+
   // The aria-valuemin attr is initialized to 0.0 if it is not defined
   var MIN_VALUE = 0.0;
 
@@ -170,7 +176,7 @@ utils.seekbars = (function() {
     updateUI: function updateUI() {
       var deltaX = this.getDeltaX();
       // Translates the handler button
-      this.handler.style.MozTransform = 'translateX(' + deltaX + 'px)';
+      this.handler.style[transformProp] = 'translateX(' + deltaX + 'px)';
 
       // Changes the progress value
       this.setValue(this.valuestart + (deltaX / this.progressWidth));
@@ -200,7 +206,7 @@ utils.seekbars = (function() {
     placeHandler: function placeHandler(value) {
       this.handler.style.left = 'calc(' + (100 * value) + '% - ' +
                                  this.halfHandlerWidth + 'px)';
-      this.handler.style.MozTransform = 'translateX(0)';
+      this.handler.style[transformProp] = 'translateX(0)';
     },
 
     destroy: function destroy() {
@@ -240,8 +246,12 @@ utils.seekbars = (function() {
   }
 
   window.addEventListener('resize', reArrange);
-  screen.addEventListener('orientationchange', reArrange);
-  window.addEventListener('orientationchange', reArrange);
+
+  try {
+    screen.addEventListener('orientationchange', reArrange);
+  } catch(ex) {
+    window.addEventListener('orientationchange', reArrange);
+  }
 
   // Initializing the library
   if (document.readyState === 'complete') {
