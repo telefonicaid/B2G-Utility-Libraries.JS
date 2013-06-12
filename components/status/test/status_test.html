@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Status Tests</title>
+    <link rel="stylesheet" href="../../../test_infra/vendor/mocha/mocha.css">
+    <style>
+      section[role="status"] p {
+        visibility: hidden;
+      }
+    </style>
+    <script src="../status.js"></script>
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="../../../test_infra/vendor/mocha/mocha.js"></script>
+    <script src="../../../test_infra/vendor/chai/chai.js"></script>
+
+    <script>mocha.setup('tdd'); window.assert = window.chai.assert;</script>
+    <script>
+      document.dispatchEvent(new Event('DOMContentLoaded'));
+    </script>
+    <script src="status_test.js"></script>
+    <script>
+      mocha.checkLeaks();
+      mocha.globals(['utils', 'assert']);
+      mocha.run();
+    </script>
+  </body>
+</html>
