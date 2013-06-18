@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap-3.0.0-wip.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome-ie7.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="brand" href="http://github.com/jsoverson/plato">Plato on Github</a>
+    <ul class="nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>components/rconsole/rconsole.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="span6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
+      <p class="stat">67.06</p>
+    </div>
+    <div class="span6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
+      <p class="stat">263</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="span6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="span6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
+      <p class="stat">31.85</p>
+    </div>
+    <div class="span6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
+      <p class="stat">1.79</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="span6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="span6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="span12">/*
+ *  Module: Console. It is based on HTML5 window.console
+ *
+ *  Product: Open Web Device
+ *
+ *  Copyright(c) 2012 Telef�nica I+D S.A.U.
+ *
+ *  LICENSE: Apache 2.0
+ *
+ *  @author Telefonica Digital
+ *
+ *  This module supports the Remote Console App on the browser
+ *
+ */
+
+var owd = window.owd || {};
+
+if(!owd.rconsole) {
+  (function() {
+    'use strict';
+
+    var rconsole = owd.rconsole = {};
+
+    // DOM convenience method
+    function ele(id) {
+      return document.getElementById(id);
+    }
+
+    // WebSocket
+    var ws;
+    // Output node on the DOM
+    var output = ele('content');
+
+    // The filter by device. Index is the index of the CSS rule that filters out
+    var filterByDevice = {str: '', index: -1};
+    // The filter by component
+    var filterByComponent = {str: '', index: -1};
+
+    // We control if the prefixed implementation is there
+    if(window.MozWebSocket) {
+      window.console.log("Mozilla's WebSocket is present")
+      window.WebSocket = window.MozWebSocket;
+    }
+
+    /**
+     * Closes the connection to the Web Socket
+     *
+     *
+     */
+    rconsole.disconnect = function() {
+      window.console.log('About to closing the connection');
+      ws.close();
+    };
+
+    /**
+     *   Extracts the device from a log message
+     *
+     *
+     */
+    function getDevice(data) {
+      return data.remote;
+    }
+
+    /**
+     *  Extracts the component from a log msg
+     *
+     *
+     */
+    function getComponent(data) {
+      var ret = null;
+
+      var idx1 = data.indexOf('[');
+      var idx2 = data.indexOf(']');
+
+      if(idx1 !== -1) {
+        ret = data.substring(idx1 + 1,idx2);
+      }
+
+      window.console.log('Component: ' + ret);
+
+      return ret;
+    }
+
+    /**
+     *   Converts an IP address to a string ready to be put on a style
+     *
+     */
+    function convertDevice(ipaddr) {
+      var regexp = /\./g;
+
+      var ret = ipaddr.replace(regexp,'-');
+
+      return ret;
+    }
+
+    /**
+     *
+     *  Performs the actual filtering
+     *
+     */
+    rconsole.filter = function() {
+      var fdevice = ele('fdevice').value;
+      var fcomponent = ele('fcomponent').value;
+
+      unFilterComponent();
+      unFilterDevice();
+
+      if(fdevice && fdevice.length > 0) {
+        filterByDevice.str = fdevice;
+        filterByDevice.index = doFilter('d-' + convertDevice(fdevice));
+      }
+
+      if(fcomponent && fcomponent.length > 0) {
+        filterByComponent.str = fcomponent;
+        filterByComponent.index = doFilter(fcomponent);
+      }
+    }
+
+    /**
+     *  Unfilters by device
+     *
+     *
+     */
+    function unFilterDevice() {
+      if(filterByDevice.index !== -1) {
+        var styleSheet = document.styleSheets[0];
+
+        styleSheet.deleteRule(filterByDevice.index);
+
+        filterByDevice.str = '';
+        filterByDevice.index = -1;
+      }
+    }
+
+    /**
+     *   Unfilters by component
+     *
+     */
+    function unFilterComponent() {
+      if(filterByComponent.index !== -1) {
+        var styleSheet = document.styleSheets[0];
+
+        styleSheet.deleteRule(filterByComponent.index);
+
+        filterByComponent.str = '';
+        filterByComponent.index = -1;
+      }
+    }
+
+    /**
+     *   Does the actual filtering by adding CSS rules to the DOM
+     *
+     *   @param str the filter to be applied
+     *
+     *
+     */
+    function doFilter(str) {
+      var styleSheet = document.styleSheets[0];
+
+      var cssRuleList = styleSheet.cssRules;
+      var rulesLength = cssRuleList.length;
+
+      var cssText = 'p:not(' + '.' + str + ')' + ' { display: none }';
+
+      var ret = styleSheet.insertRule (cssText, rulesLength);
+
+      return ret;
+    }
+
+    /**
+     *  When new data arrives is in charge of adding it to the console
+     *
+     *
+     */
+    function ondatareceived(d) {
+      window.console.log(d);
+
+      var obj;
+      var text;
+
+      try {
+        obj = JSON.parse(d);
+      }
+      catch(e) { window.console.log('Exception!!!'); text = d; }
+
+      if(obj.type === 'trace') {
+        text = obj.data.text;
+      }
+      else if(obj.type === 'notification') {
+          text = obj.data;
+      }
+      else if(obj.type === 'response' && obj.method === 'eval') {
+        text = obj.params.result;
+      }
+
+      var ntext = document.createElement('p');
+      ntext.textContent = '<' + getDevice(obj) +  '>' + ' ' + text;
+      var component = getComponent(text);
+      if(component) {
+        ntext.classList.add(component);
+      }
+
+      ntext.classList.add('d-' + convertDevice(getDevice(obj)));
+
+      window.console.log(obj.params);
+      if(obj.data && obj.data.params && obj.data.params.error === true) {
+        ntext.classList.add('error');
+      }
+
+      output.appendChild(ntext);
+    }
+
+    rconsole.clear = function() {
+      output.innerHTML = '';
+    };
+
+    /**
+     *  Requests the Remote Execution of an expression
+     *
+     */
+    rconsole.rexec = function() {
+      var obj = {};
+
+      obj.type = 'request';
+      obj.method = 'eval'; obj.params = {};
+
+      var expression = document.querySelector('#expression').value;
+
+      obj.params.expression = expression;
+
+      ws.send(JSON.stringify(obj));
+    };
+
+    /**
+     *  Sets up the Web Socket to receive data
+     *
+     */
+    rconsole.setupWS = function () {
+      var addr = ele('address').value;
+      var taddr = addr;
+
+      var WS_SCHEME = 'ws://';
+
+      if(addr && addr.length > 0) {
+        if(addr.indexOf(WS_SCHEME) === -1) {
+          taddr = WS_SCHEME + addr;
+        }
+        ws = new WebSocket(taddr);
+
+        ws.onopen = function() {
+            window.console.log('WS has been opened');
+
+            var obj = {};
+            obj.type = 'request';
+            obj.method = 'register'; obj.params = {};
+            obj.params.type = 'console';
+
+            ws.send(JSON.stringify(obj));
+        };
+
+        ws.onerror = function() {
+            window.console.log('Error!!!');
+        };
+
+        ws.onclose = function(e) {
+            window.console.log('WS has been closed');
+            output.innerHTML = '';
+        };
+
+        ws.onmessage = function(e) {
+            window.console.log('Data received');
+
+            ondatareceived(e.data);
+        };
+      }
+    };
+  }() );
+}</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

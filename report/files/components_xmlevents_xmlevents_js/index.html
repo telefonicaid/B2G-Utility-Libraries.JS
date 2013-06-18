@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap-3.0.0-wip.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome-ie7.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="brand" href="http://github.com/jsoverson/plato">Plato on Github</a>
+    <ul class="nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>components/xmlevents/xmlevents.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="span6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
+      <p class="stat">61.70</p>
+    </div>
+    <div class="span6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
+      <p class="stat">186</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="span6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="span6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
+      <p class="stat">30.35</p>
+    </div>
+    <div class="span6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
+      <p class="stat">1.09</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="span6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="span6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="span12">/*
+ *  Module: XML Events
+ *
+ *  Product: Open Web Device
+ *
+ *  Copyright(c) 2012 Telefónica I+D S.A.U.
+ *
+ *  LICENSE: Apache 2.0
+ *
+ *  @author Telefonica Digital
+ *
+ *  .defaultAction can be 'cancel' or 'perform' ('perform' by default)
+ *
+ *  .propagate can be 'continue' or 'stop' ('continue' by default)
+ *
+ *  .phase can be one of ['bubble','capture','default'] ('default' by default)
+ *
+ *  @example
+ *
+ *  <listener id="l1" event="touchstart" observer="#myContainer">
+ *
+ *  @example
+ *
+ *  <listener id="l2" event="click" target="#myElement"
+ *              observer="#myContainer" phase="capture"
+ *              defaultAction="cancel"  propagate="stop" />
+ *
+ */
+
+'use strict';
+
+var utils = window.utils || {};
+
+if(!utils.xmlevents) {
+  (function() {
+    // Automagically attach the event handlers
+    window.addEventListener('DOMContentLoaded',attachHandlers);
+
+    // To store the list of listeners
+    var listeners = {};
+
+    // Auxiliary Variable for creating the API
+    var xmlEvents = utils.xmlevents = {};
+
+    /**
+     *  Attachs the specified listener to the subTree
+     *
+     *  @param listenerId id of the listener element to be attached
+     *  @param subTree on which perform the attachment (document by default)
+     *
+     *  subTree can be either a selector or a HTMLDOMElement
+     *
+     */
+    xmlEvents.attach = function(listenerId,subTree) {
+      var listener = listeners[listenerId];
+
+      if(listener) {
+        addEventListener(listener,subTree);
+      }
+    };  // xmlevents.attach
+
+    /**
+     *  Returns an enriched handler for listening to an event
+     *
+     *  @f the original handler
+     *
+     *  @prevent boolean indicating whether preventDefault must be invoked
+     *  @stop boolean indicating whether stopPropagation must be invoked
+     *
+     *
+     */
+    function getHandler(f,prevent,stop) {
+      return function(e) {
+        f(e);
+        if(prevent === true) {
+          e.preventDefault();
+        }
+
+        if(stop === true) {
+          e.stopPropagation();
+        }
+      };
+    }  // getHandler
+
+
+    /**
+     *  Core function invoked when a DOMContentLoaded happens
+     *
+     */
+    function attachHandlers() {
+      var scrBlocks = document.querySelectorAll('script.events[type="text/xml"]');
+
+      if(scrBlocks && scrBlocks.length > 0) {
+        var totalBlocks = scrBlocks.length;
+
+        for(var c = 0; c < totalBlocks; c++) {
+          var xmlContent = '<listeners>' + scrBlocks.item(c).textContent
+                                + '</listeners>';
+
+          var oParser = new DOMParser();
+          var doc = oParser.parseFromString(xmlContent,"text/xml");
+
+          if(doc.documentElement.nodeName === "parsererror") {
+              window.console.log('Error while parsing the listeners');
+          }
+          else {
+            var elements = doc.getElementsByTagName('listener');
+
+            var nlisteners = elements.length;
+
+            for(var counter = 0; counter < nlisteners; counter++) {
+              parseListener(elements[counter]);
+            }
+          } // totalBlocks iteration
+        } // if(scrBlock)
+      }
+
+      // Event handler is removed
+      window.setTimeout(function() {
+        window.removeEventListener('DOMContentLoaded',attachHandlers) }, 0);
+    } // attachHandlers
+
+
+    /**
+     *  Adds a listener to the specified subTree
+     *
+     *  @listener listener object with all the listener params
+     *  @subTree subTree (if not specified it will be the whole document)
+     *
+     *
+     */
+    function addEventListener(listener,subTree) {
+      var sel = listener.target;
+
+      if(listener.observer && listener.target) {
+        sel = listener.observer + ' ' + listener.target;
+      } else if(listener.observer) {
+        sel = listener.observer;
+      }
+
+      // If we need to add only the listeners on a particular subtree
+      var tree = document;
+
+      // Checking whether it is a DOM element or a selector to a DOM element
+      if(subTree && !subTree.tagName) {
+        tree = document.querySelector(subTree);
+      }
+      else if(subTree && subTree.tagName) {
+        tree = subTree;
+      }
+
+      // the affected elements
+      var elements = tree.querySelectorAll(sel);
+
+      if(elements.length > 0) {
+        for(var i = 0; i < elements.length; i++) {
+          elements.item(i).addEventListener(listener.eventx,
+                                            listener.theFunction,
+                                                listener.useCapture);
+        }
+      }
+    } // addEventListener
+
+
+    /**
+     *  Parses a listener from an XML element
+     *
+     *
+     */
+    function parseListener(e) {
+      var id = e.getAttribute('id');
+      var listener = {};
+
+      listener.target = e.getAttribute('target');
+      listener.eventx = e.getAttribute('event');
+      listener.observer = e.getAttribute('observer');
+      var functionx = e.getAttribute('function');
+
+      // Check whether phase is capture or not
+      var phase = e.getAttribute('phase');
+      listener.useCapture = false;
+      if(phase && phase === 'capture') {
+        listener.useCapture = true;
+      }
+
+      var propagate = e.getAttribute('propagate');
+      var defAction = e.getAttribute('defaultAction');
+
+      var fx = eval(functionx);
+      listener.theFunction = fx;
+      listener.prevent = false;
+      listener.stop = false;
+
+      if(defAction && defAction === 'cancel') {
+        listener.prevent = true;
+      }
+
+      if(propagate && propagate === 'stop') {
+        listener.stop = true;
+      }
+
+      if(typeof fx === "function") {
+        if(listener.prevent || listener.stop) {
+          listener.theFunction = getHandler(fx,listener.prevent,listener.stop);
+        }
+
+        if(id) {
+          listeners[id] = listener;
+        }
+
+        addEventListener(listener);
+      }
+    } // parseListener
+})();
+} // window.xmlevents</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

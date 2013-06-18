@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap-3.0.0-wip.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome-ie7.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="brand" href="http://github.com/jsoverson/plato">Plato on Github</a>
+    <ul class="nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>components/image-loader/image_loader.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="span6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
+      <p class="stat">64.85</p>
+    </div>
+    <div class="span6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
+      <p class="stat">153</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="span6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="span6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
+      <p class="stat">35.96</p>
+    </div>
+    <div class="span6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
+      <p class="stat">0.74</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="span6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="span6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="span12">/**
+ *  Module: Image Loader
+ *
+ *  Product: Open Web Device
+ *
+ *  Copyright(c) 2012 Telef�nica I+D S.A.U.
+ *
+ *  LICENSE: Apache 2.0
+ *
+ *  @author Telefonica Digital
+ *
+ */
+
+'use strict';
+
+if (!window.ImageLoader) {
+
+  /**
+    *  The constructor of the ImageLoader Object
+    *
+    *  @param{String} Selector that defines the scrollable container
+    *
+    *  @param{Object} Selector that defines the list of items that contains
+    *                 the images
+    *
+    */
+  var ImageLoader = function ImageLoader(pContainer, pItems) {
+    var container, items, itemsSelector, scrollLatency = 100, scrollTimer,
+        lastViewTop = 0, itemHeight, total, imgsLoading = 0;
+
+    var forEach = Array.prototype.forEach;
+
+    init(pContainer, pItems);
+
+    /**
+     *  Initializer
+     *
+     *  @param{String} Selector that defines the scrollable container
+     *
+     *  @param{Object} Selector that defines the list of items that contains
+     *                 the images
+     *
+     */
+    function init(pContainer, pItems) {
+      itemsSelector = pItems;
+      container = document.querySelector(pContainer);
+
+      container.addEventListener('scroll', onScroll);
+      document.addEventListener('onupdate', function(evt) {
+        evt.stopPropagation();
+        onScroll();
+      });
+
+      load();
+    }
+
+    /**
+     *  This function is invoked when we change the list of items
+     *
+     */
+    function load() {
+      window.clearTimeout(scrollTimer);
+      items = container.querySelectorAll(itemsSelector);
+      // All items have the same height
+      itemHeight = items[0] ? items[0].offsetHeight : 1;
+      total = items.length;
+      // Initial check if items should appear
+      window.setTimeout(update, 0);
+    }
+
+    /**
+     *  This function is invoked when the scrollable container is translated
+     *
+     */
+    function onScroll() {
+      window.clearTimeout(scrollTimer);
+      if (imgsLoading > 0) {
+        // Stop the pending images load
+        window.stop();
+        imgsLoading = 0;
+      }
+      scrollTimer = window.setTimeout(update, scrollLatency);
+    }
+
+    /**
+     *  Loads the image contained in a DOM Element.
+     */
+    function loadImage(item) {
+      var image = item.querySelector('img[data-src]');
+      if (!image) {
+        return;
+      }
+
+      ++imgsLoading;
+      var tmp = new Image();
+      var src = tmp.src = image.dataset.src;
+      tmp.onload = function onload() {
+        --imgsLoading;
+        image.src = src;
+        if (tmp.complete) {
+          item.dataset.visited = 'true';
+        }
+        tmp = null;
+      };
+
+      tmp.onabort = tmp.onerror = function onerror() {
+        item.dataset.visited = 'false';
+        tmp = null;
+      }
+    }
+
+    /**
+     *  Calculates the set of items that are in the current viewport
+     *
+     */
+    function update() {
+      if (total === 0) {
+        return;
+      }
+
+      var viewTop = container.scrollTop;
+      // Index is always inside or below viewport
+      var index = Math.floor(viewTop / itemHeight);
+      var containerHeight = container.offsetHeight;
+
+      // Goes backward
+      for (var i = index; i >= 0; i--) {
+        var item = items[i];
+        if (item) {
+          if (item.offsetTop + itemHeight < viewTop) {
+            break; // Over
+          }
+
+          if (item.dataset.visited !== 'true' &&
+              item.offsetTop <= viewTop + containerHeight) {
+            loadImage(item); // Inside
+          }
+        }
+      }
+
+      // Goes forward
+      for (var j = index + 1; j < total; j++) {
+        var item = items[j];
+        if (!item) {
+          // Returning because of index out of bound
+          return;
+        }
+
+        if (item.offsetTop > viewTop + containerHeight) {
+          return; // Below
+        }
+
+        if (item.dataset.visited !== 'true') {
+          loadImage(item);
+        }
+      }
+    } // update
+
+    /**
+     *  This function is public and it should be performed when the list of
+     *  items has changed
+     *
+     */
+    this.reload = load;
+  };
+}</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

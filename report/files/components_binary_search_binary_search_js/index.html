@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap-3.0.0-wip.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome-ie7.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="brand" href="http://github.com/jsoverson/plato">Plato on Github</a>
+    <ul class="nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>components/binary-search/binary_search.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="span6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
+      <p class="stat">49.79</p>
+    </div>
+    <div class="span6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
+      <p class="stat">113</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="span6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="span6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
+      <p class="stat">61.82</p>
+    </div>
+    <div class="span6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
+      <p class="stat">0.67</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="span6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="span6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="span12">/**
+ *  Module: Binary Search
+ *
+ *  Product: Open Web Device
+ *
+ *  Copyright(c) 2012 Telefónica I+D S.A.U.
+ *
+ *  LICENSE: Apache 2.0
+ *
+ *  @author Telefonica Digital
+ *
+ *  This function performs a binary search over an already sorted array
+ *  target is the target item to search for
+ *  array is the sorted array
+ *  options is an optional object which may contain
+ *  the start and end position (from, to)
+ *  an optional arrayField which indicates the object property that contains the
+ *  comparable item and transform and compare functions
+ *
+ *  Returns an array with the positions on which the target item was found
+ *
+ */
+
+'use strict';
+
+var utils = this.utils || {};
+
+
+utils.binarySearch = function(target, array, options) {
+  var arrayField = options.arrayField,
+      transformFunction = options.transformFunction,
+      compareFunction = options.compareFunction;
+
+  // Obtains the comparable item by transforming if necessary
+  function getItem(array, index) {
+    var item = array[index];
+    if (arrayField) {
+      item = item[arrayField];
+      if (typeof transformFunction === 'function') {
+        item = transformFunction(item);
+      }
+    }
+    return item;
+  }
+
+  // Compares the target with an array item
+  function compare(target, item) {
+    var out;
+    if (typeof compareFunction === 'function') {
+      out = compareFunction(target, item);
+    }
+    else {
+      if (typeof target === 'string') {
+         out = target.localeCompare(item);
+      }
+      else {
+        out = target.toString().localeCompare(item);
+      }
+    }
+
+    return out;
+  }
+
+  var from = options.from;
+  if (typeof from === 'undefined') {
+    from = 0;
+  }
+  var to = options.to;
+  if (typeof to === 'undefined') {
+    to = array.length - 1;
+  }
+
+  if (to < from) {
+    // Not found
+    return [];
+  }
+
+  var middleIndex = Math.floor((to - from) / 2);
+  var item = getItem(array, from + middleIndex);
+
+  var compareResult = compare(target, item);
+
+  if (compareResult === 0) {
+    // Once a result is found let's iterate in both directions to get the rest
+    // Just in case there are more than one result
+    var results = [from + middleIndex];
+
+    var next = from + middleIndex + 1;
+    var finish = false;
+    while (next <= (array.length - 1) && !finish) {
+      var item = getItem(array, next);
+
+      if (compare(target, item) === 0) {
+        results.push(next);
+      }
+      else {
+        finish = true;
+      }
+      next++;
+    }
+
+    finish = false;
+    next = from + middleIndex - 1;
+
+    while (next >= 0 && !finish) {
+      var item = getItem(array, next);
+
+      if (compare(target, item) === 0) {
+        results.push(next);
+      }
+      else {
+        finish = true;
+      }
+      next--;
+    }
+    return results;
+  }
+  else if (compareResult < 0) {
+    return utils.binarySearch(target, array, {
+      from: from,
+      to: to - middleIndex - 1,
+      arrayField: arrayField,
+      transformFunction: transformFunction,
+      compareFunction: compareFunction
+    });
+  }
+  else {
+    return utils.binarySearch(target, array, {
+      from: from + middleIndex + 1,
+      to: to,
+      arrayField: arrayField,
+      transformFunction: transformFunction,
+      compareFunction: compareFunction
+    });
+  }
+};</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap-3.0.0-wip.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome-ie7.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="brand" href="http://github.com/jsoverson/plato">Plato on Github</a>
+    <ul class="nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>components/templates/test/templates_test.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="span6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
+      <p class="stat">67.17</p>
+    </div>
+    <div class="span6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
+      <p class="stat">268</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="span6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="span6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty"></i></a></h2>
+      <p class="stat">36.29</p>
+    </div>
+    <div class="span6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs"></i></a></h2>
+      <p class="stat">1.81</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="span6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="span6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="span12">suite('Test Templates', function() {
+
+  function resetLists() {
+    var ols = document.querySelectorAll('#test_section > ol');
+    for (var j = 0; j < ols.length; j++) {
+      var ol = ols.item(j);
+      var templateLis = ol.querySelectorAll('[data-template]');
+
+      ol.innerHTML = '';
+      for (var k = 0; k < templateLis.length; k++) {
+        ol.appendChild(templateLis.item(k));
+      }
+    }
+  }
+
+  function assertAppend(container, child) {
+    assert.equal(container.children[container.children.length - 1], child);
+  }
+
+  function assertPrepend(container, child) {
+    assert.equal(container.firstElementChild, child);
+  }
+
+  setup(function() {
+    resetLists();
+  });
+
+  test('Template > Append > Object as data model', function() {
+
+    var data = {
+      id: 'id1',
+      data: 'Data 1'
+    };
+
+    var target = document.getElementById('test');
+
+    utils.templates.append('#test', data);
+
+    var l1 = document.getElementById('id1');
+    assert.equal(l1.textContent, 'Data 1');
+
+    // The template + the added element
+    assert.equal(target.children.length, 2);
+    assertAppend(target, l1);
+  });
+
+  test('Template > Append > Array as data model', function() {
+
+    var data = [
+      {
+        id: 'id1',
+        data: 'Data 1'
+      },
+      {
+        id: 'id2',
+        data: 'Data 2'
+      }
+    ];
+
+    utils.templates.append('#test', data);
+
+    var l1 = document.getElementById('id1');
+    assert.equal(l1.textContent, 'Data 1');
+
+    var l2 = document.getElementById('id2');
+    assert.equal(l2.textContent, 'Data 2');
+
+    var target = document.getElementById('test');
+
+    // The template + the added elements
+    assert.equal(target.children.length, 3);
+
+    assertAppend(target, l2);
+    assert.equal(l1.nextElementSibling, l2);
+  });
+
+  test('Template > Append > Dotted Structure', function() {
+
+    var data = {
+      data: {
+        id: 'id4',
+        data: 'Data 4'
+      }
+    };
+
+    utils.templates.append('#test2', data);
+
+    var l1 = document.getElementById('id4');
+    assert.equal(l1.textContent, 'Data 4');
+
+    var target = document.getElementById('test2');
+
+    // The template + the added element
+    assert.equal(target.children.length, 2);
+
+    assertAppend(target, l1);
+  });
+
+  test('Template > Append > Function Data', function() {
+
+    var data = {
+      data: {
+        id: 'id_function',
+        dataFunction: function() {
+          return {
+                    data: 'Data Function'
+          };
+        }
+      }
+    };
+
+    utils.templates.append('#test21', data);
+
+    var l1 = document.getElementById('id_function');
+    assert.equal(l1.textContent, 'Data Function');
+
+    var target = document.getElementById('test21');
+
+    // The template + the added element
+    assert.equal(target.children.length, 2);
+
+    assertAppend(target, l1);
+  });
+
+  test('Template > Prepend > Array as data model', function() {
+
+    var data = [
+      {
+        id: 'id1',
+        data: 'Data 1'
+      },
+      {
+        id: 'id2',
+        data: 'Data 2'
+      }
+    ];
+
+    utils.templates.prepend('#test', data);
+
+    var target = document.getElementById('test');
+
+    var l2 = document.getElementById('id2');
+    assert.equal(l2.parentNode.firstChild, l2);
+
+    var l1 = document.getElementById('id1');
+    assert.equal(l2.nextSibling, l1);
+
+    // // The template + the added elements
+    assert.equal(target.children.length, 3);
+
+    assertPrepend(target, l2);
+    assert.equal(l2.nextElementSibling, l1);
+  });
+
+
+  test('Template > Append > Condition over data > First met', function() {
+
+    var data = {
+      id: '123abcdef',
+      condition: {
+        displayRow0: function() {
+          return true;
+        }
+      }
+    };
+
+    utils.templates.append('#test3', data);
+
+    var target = document.getElementById('test3');
+
+    var li = document.getElementById('123abcdef');
+    assert.equal(li.textContent, 'Row 0');
+
+    // Two from template + one rendered
+    assert.equal(target.children.length, 3);
+
+    assertAppend(target, li);
+  });
+
+  test('Template > Append > Condition over data > Second met', function() {
+
+    var data = {
+      id: '123abcdef',
+      condition: {
+        displayRow0: false,
+        displayRow1: true
+      }
+    };
+
+    utils.templates.append('#test3', data);
+
+    var target = document.getElementById('test3');
+
+    var li = document.getElementById('123abcdef');
+    assert.equal(li.textContent, 'Row 1');
+
+    // Two from template + one rendered
+    assert.equal(target.children.length, 3);
+
+    assertAppend(target, li);
+  });
+
+
+  test('Template > Append > Condition over data > First met. Second ignored', function() {
+
+    var data = {
+      id: '123abcdef',
+      condition: {
+        displayRow0: function() {
+          return true;
+        },
+        displayRow1: function() {
+          return true;
+        }
+      }
+    };
+
+    utils.templates.append('#test3', data);
+
+    var target = document.getElementById('test3');
+
+    var li = document.getElementById('123abcdef');
+    assert.equal(li.textContent, 'Row 0');
+
+    // Two from template + one rendered
+    assert.equal(target.children.length, 3);
+
+    assertAppend(target, li);
+  });
+
+  test('Template > Prepend Array > Condition over data', function() {
+
+    var data = [
+      {
+        id: '123abcdef',
+        condition: {
+          displayRow0: function() {
+            return true;
+          }
+        }
+      },
+      {
+        id: 'fgh789',
+        condition: {
+          displayRow1: true
+        }
+      }
+    ];
+
+    utils.templates.prepend('#test3', data);
+
+    var target = document.getElementById('test3');
+
+    // Check that conditions were applied properly
+    var l1 = document.getElementById('123abcdef');
+    assert.equal(l1.textContent, 'Row 0');
+    var l2 = document.getElementById('fgh789');
+    assert.equal(l2.textContent, 'Row 1');
+
+    // Two from template + two rendered
+    assert.equal(target.children.length, 4);
+
+    // Check that prepend was actually done
+    assertPrepend(target, l2);
+    assert.equal(l2.nextSibling, l1);
+  });
+
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
