@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Action Menu Tests</title>
+    <link rel="stylesheet" href="../../../test_infra/vendor/mocha/mocha.css">
+    <link rel="stylesheet" href="../../../test_infra/vendor/jscovreporter/reporter.css">
+    <link rel="stylesheet" href="../../../test_infra/vendor/jscovreporter_custom/reporter.css">
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="../../../test_infra/vendor/mocha/mocha.js"></script>
+    <script src="../../../test_infra/vendor/chai/chai.js"></script>
+
+    <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    <script src="../../../test_infra/vendor/underscore/underscore-min.js"></script>
+    <script src="../../../test_infra/vendor/backbone/backbone-min.js"></script>
+    <script src="../../../test_infra/vendor/jscovreporter/reporter.js"></script>
+    <script src="../../../test_infra/vendor/jscovreporter/JSCovReporter.js"></script>
+
+    <script>mocha.setup('tdd'); window.assert = window.chai.assert;</script>
+    <script src="../action_menu.js"></script>
+    <script src="action_menu_test.js"></script>
+    <script src="../instrumented/action_menu.js"></script>
+
+    <script>
+      mocha.checkLeaks();
+      mocha.globals(['utils', 'assert']);
+      mocha.run(function () {
+        if (typeof window.__$coverObject !== 'undefined') {
+          var reporter = new JSCovReporter({ coverObject: window.__$coverObject });
+        }
+      });
+    </script>
+
+    <section id="test_section" style="visibility: hidden"></section>
+    <div id="coverage"></div>
+    <div id="menu"></div>
+  </body>
+</html>

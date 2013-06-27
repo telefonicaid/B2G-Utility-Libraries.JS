@@ -1,0 +1,34 @@
+
+form[role="dialog"][data-type="action"] {
+  animation-name: hide;
+  animation-duration: .3s;
+  animation-fill-mode: forwards;
+  pointer-events: none;
+}
+
+form[role="dialog"][data-type="action"].hidden {
+  display: none;
+}
+
+form[role="dialog"][data-type="action"].onviewport  {
+  animation-name: show;
+  pointer-events: auto;
+}
+
+@keyframes show {
+  from {
+    opacity: 0
+  }
+  to {
+    opacity: 1
+  }
+}
+
+@keyframes hide {
+  from {
+    opacity: 1
+  }
+  to {
+    opacity: 0
+  }
+}
