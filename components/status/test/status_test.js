@@ -2,6 +2,8 @@ suite('Test Status ', function() {
   var status, content;
 
   suiteSetup(function() {
+    utils.status.init();
+    utils.status.setDuration(1000); // 1sec displayed
     status = document.querySelector('[role="status"]');
     content = status.querySelector('p');
   });
@@ -41,6 +43,10 @@ suite('Test Status ', function() {
       assert.isFalse(status.classList.contains('hidden'));
       assert.isTrue(status.classList.contains('onviewport'));
 
+      // It doesn't fail with unsupported parameters
+      utils.status.show({});
+      assert.equal(content.textContent, '');
+
       done();
     });
 
@@ -60,7 +66,8 @@ suite('Test Status ', function() {
   });
 
   test('The component has been destroyed correctly ', function() {
+    var len = document.querySelectorAll('[role="status"]').length;
     utils.status.destroy();
-    assert.equal(document.querySelectorAll('[role="status"]').length, 0);
+    assert.equal(document.querySelectorAll('[role="status"]').length, len - 1);
   });
 });
