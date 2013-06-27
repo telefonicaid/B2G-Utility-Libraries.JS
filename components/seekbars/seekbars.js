@@ -204,8 +204,7 @@ utils.seekbars = (function() {
     },
 
     placeHandler: function placeHandler(value) {
-      this.handler.style.left = 'calc(' + (100 * value) + '% - ' +
-                                 this.halfHandlerWidth + 'px)';
+      this.handler.style.left = (100 * value) + '%';
       this.handler.style[transformProp] = 'translateX(0)';
     },
 
@@ -301,11 +300,13 @@ utils.seekbars = (function() {
         });
       }
 
+      var wrapper = document.createElement('div');
       var progress = document.createElement('progress');
       progress.setAttribute('role', 'presentation');
 
-      slider.appendChild(progress);
-      slider.appendChild(document.createElement('button'));
+      wrapper.appendChild(progress);
+      wrapper.appendChild(document.createElement('button'));
+      slider.appendChild(wrapper);
 
       return slider;
     }

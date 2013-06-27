@@ -38,7 +38,7 @@ suite('Test Seekbars', function() {
     });
 
     test('The component was initialized correctly ', function() {
-      assert.equal(handler.style.left, 'calc(0% - ' + halfHandlerWidth + 'px)');
+      assert.equal(handler.style.left, '0%');
       assert.equal(progress.max, 1);
       checkValues(0, 0);
     });
@@ -90,8 +90,7 @@ suite('Test Seekbars', function() {
     });
 
     test('The component was initialized correctly ', function() {
-      assert.equal(handler.style.left, 'calc(0% - ' +
-                                             (handler.clientWidth / 2) + 'px)');
+      assert.equal(handler.style.left, '0%');
       assert.equal(progress.max, 1);
       checkValues(0, -5);
     });
