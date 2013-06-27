@@ -8,3 +8,12 @@
 [submodule "building-blocks"]
 	path = building-blocks
 	url = https://github.com/buildingfirefoxos/Building-Blocks.git
+[submodule "test_infra/vendor/jscovreporter"]
+	path = test_infra/vendor/jscovreporter
+	url = https://github.com/TwoApart/JSCovReporter.git
+[submodule "test_infra/vendor/backbone"]
+	path = test_infra/vendor/backbone
+	url = https://github.com/documentcloud/backbone.git
+[submodule "test_infra/vendor/underscore"]
+	path = test_infra/vendor/underscore
+	url = https://github.com/documentcloud/underscore.git
