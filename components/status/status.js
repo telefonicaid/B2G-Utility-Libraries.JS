@@ -97,6 +97,30 @@ utils.status = (function() {
     return path.substring(0, path.lastIndexOf('/') + 1);
   }
 
+  function addStylesheet() {
+    var link = document.createElement('link');
+    link.type = 'text/css';
+    link.rel = 'stylesheet';
+    link.href = getPath() + 'status-behavior.css';
+    document.head.appendChild(link);
+  }
+
+  function build() {
+    section = document.createElement('section');
+
+    addStylesheet();
+
+    section.setAttribute('role', 'status');
+    section.classList.add('hidden');
+
+    content = document.createElement('p');
+
+    section.appendChild(content);
+    document.body.appendChild(section);
+
+    section.addEventListener('animationend', animationEnd);
+  }
+
   /*
    * Initializes the library. Basically it creates the markup:
    *
@@ -109,26 +133,7 @@ utils.status = (function() {
       return;
     }
 
-    var link = document.createElement('link');
-    link.type = 'text/css';
-    link.rel = 'stylesheet';
-    link.href = getPath() + 'status-behavior.css';
-    document.head.appendChild(link);
-
-    section = document.createElement('section');
-    section.setAttribute('role', 'status');
-    section.classList.add('hidden');
-
-    content = document.createElement('p');
-
-    section.appendChild(content);
-    document.body.appendChild(section);
-
-    section.addEventListener('animationend', animationEnd);
-
-    window.addEventListener('statusshow', function onStatusStart(e) {
-      show(e.detail.message, e.detail.duration);
-    });
+    build();
   }
 
   // Initializing the library
@@ -142,6 +147,11 @@ utils.status = (function() {
   }
 
   return {
+    /*
+     * The library is auto-initialized but it is for unit testing purposes
+     */
+    init: initialize,
+
     /*
      * Shows the status component
      *
