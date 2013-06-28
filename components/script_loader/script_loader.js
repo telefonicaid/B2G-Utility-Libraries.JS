@@ -192,7 +192,7 @@ var utils = this.utils || {};
 
 
   function getExtension(resourceSrc) {
-    return resourceSrc.match(/\.(.*?)$/)[1];
+    return resourceSrc.substring(resourceSrc.lastIndexOf('.') + 1);
   }
 
   function resourceError(e) {
