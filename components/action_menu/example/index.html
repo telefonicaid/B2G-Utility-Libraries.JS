@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>Action menus</title>
+  <link rel="stylesheet" href="../../../building-blocks/style/action_menu.css">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-size: 62.5%!important;
+      background-color: #fff;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    button {
+      font-size: 2rem;
+      margin: 1rem 10% 1rem 10%;
+      display: block;
+      text-align: center;
+      width: 80%;
+    }
+
+    form[role="dialog"][data-type="action"] > menu > button.ball {
+      padding-left: 4rem;
+      background: url(http://wichitaatbat.com/wp-content/uploads/Soccer-Ball.png) #5f5f5f no-repeat 1rem center;
+      background-size: 2rem auto;
+    }
+  </style>
+
+  <script type="text/javascript" src="../action_menu.js"></script>
+  <script type="text/javascript" defer src="app.js"></script>
+</head>
+
+<body>
+  <button id="fruitsButton">Show fruits</button>
+  <button id="soccerButton">Show soccer players</button>
+  <button id="templateButton">Show template</button>
+
+  <form id="templateAction" role="dialog" data-type="action" class="hidden">
+    <section>
+      <h1>Title</h1>
+    </section>
+    <menu class="actions">
+      <button>Action 1</button>
+      <button>Action 2</button>
+      <button>Action 3</button>
+      <button>Cancel</button>
+    </menu>
+  </form>
+</body>
+</html>
