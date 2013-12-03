@@ -105,7 +105,7 @@ utils.navigation = (function() {
   };
 
   /**
-   * Navigates to the provided view.
+   * Navigates to the selected view.
    *  @param {String} next view CSS selector
    */
   var go = function ng_go(nextViewCSSSelector, callback) {
@@ -171,6 +171,7 @@ utils.navigation = (function() {
 
   /**
    * Undoes the last navigation.
+   *  @param {Function} Callback to call once the transition ends.
    */
   var back = function ng_back(callback) {
     if (stack.length < 2) {
@@ -233,7 +234,7 @@ utils.navigation = (function() {
   };
 
   /**
-   * Undoes all the navigations and gets back to the initial state.
+   * Undoes all previous navigations and goes back to the initial view.
    */
   var home = function ng_home() {
     if (stack.length < 2) {
