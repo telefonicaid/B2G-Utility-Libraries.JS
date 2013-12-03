@@ -55,7 +55,7 @@ Go the the previous view:
  * Undoes the last navigation.
  *  @param {Function} Callback to call once the transition ends.
  */
-utils.navigation.back(function() {
+utils.navigation.back(function callback() {
   ...
 });
 ```
