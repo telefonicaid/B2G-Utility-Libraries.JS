@@ -7,13 +7,13 @@ utils.navigation = (function() {
   var isWebkit = 'webkitRequestAnimationFrame' in window;
 
   /**
-   *  Each animation entry includes a 'forwards' property including the
+   *  Each transition entry includes a 'forwards' property including the
    *    classes which will be added to the 'current' and 'next' view when the
-   *    animation goes forwards, as well as a 'backwards' property including the
+   *    transition goes forwards, as well as a 'backwards' property including the
    *    classes which will be added to the 'current' and 'next' view when the
-   *    animation goes backwards.
+   *    transition goes backwards.
    */
-  var animations = {
+  var transitions = {
     'push-from-right': {
       forwards: {
         current: 'moveLeftOut',
@@ -66,24 +66,24 @@ utils.navigation = (function() {
   /** The stack of views. */
   var stack = [];
 
-  /** Number of running animations. */
-  var runningAnimations = 0;
+  /** Number of running transition. */
+  var runningTransitions = 0;
 
   /**
-   * Calls the passed callback when the animations end.
+   * Calls the passed callback when the transitions end.
    *  @param {HTMLElement} The view being animated.
    *  @param {Function} callback The callback to call.
    */
-  var waitForAnimation = function ng_callWhenAnimationEnds(
+  var waitForTransition = function ng_callWhenTransitionEnds(
     view, callback) {
     if (callback) {
-      ++runningAnimations;
-      view.addEventListener(isWebkit ? 'webkitAnimationEnd' : 'animationend',
-        function ng_animationEnded(ev) {
-          view.removeEventListener(isWebkit ? 'webkitAnimationEnd' :
-                                   'animationend', ng_animationEnded);
-          --runningAnimations;
-          if (!runningAnimations) {
+      ++runningTransitions;
+      view.addEventListener(isWebkit ? 'webkitTransitionEnd' : 'transitionend',
+        function ng_transitionEnded(ev) {
+          view.removeEventListener(isWebkit ? 'webkitTransitionEnd' :
+                                   'transitionend', ng_transitionEnded);
+          --runningTransitions;
+          if (!runningTransitions) {
             setTimeout(callback, 0);
           }
         }
@@ -93,20 +93,23 @@ utils.navigation = (function() {
 
   /**
    * Initializes the navigation library.
-   *  @param {String} currentView CSS selector
+   *  @param {String} Current view CSS selector
    *  @param {Number} zIndex Initial z-index
    */
-  var init = function ng_init(currentView, zIndex) {
-    _currentView = currentView || '[data-position="current"]';
+  var init = function ng_init(currentViewCSSSelector, zIndex) {
+    _currentView = currentViewCSSSelector ? document.querySelector(
+      currentViewCSSSelector) : document.querySelector(
+      '[data-position="current"]');
     stack = [];
-    stack.push({view: _currentView, animation: '', zIndex: zIndex || 0});
+    stack.push({view: _currentView, transition: '', zIndex: zIndex || 0});
   };
 
   /**
    * Navigates to the provided view.
-   *  @param {String} nextView CSS selector
+   *  @param {String} next view CSS selector
    */
-  var go = function ng_go(nextView, callback) {
+  var go = function ng_go(nextViewCSSSelector, callback) {
+    var nextView = document.querySelector(nextViewCSSSelector);
     if (_currentView === nextView) {
       return;
     }
@@ -116,30 +119,52 @@ utils.navigation = (function() {
       return item.view !== nextView;
     });
 
-    var current = document.querySelector(_currentView);
-    
-    var next = document.querySelector(nextView);
+    var current = _currentView, next = nextView;
 
-    var animation = next.getAttribute('data-transition') + '-from-' +
-        next.getAttribute('data-position');
+    var dataPosition = next.getAttribute('data-position');
+    var transition = next.getAttribute('data-transition') + '-from-' +
+        dataPosition;
 
-    var forwardsClasses = animations[animation].forwards;
-    var backwardsClasses = animations[animation].backwards;
+    var forwardsClasses = transitions[transition].forwards;
+    var backwardsClasses = transitions[transition].backwards;
 
     // Add forwards class to current view.
     if (forwardsClasses.current) {
       current.classList.add(forwardsClasses.current);
-      waitForAnimation(current, callback);
+      var onCurrentForwards = function ng_onCurrentForwards() {
+        current.removeEventListener(isWebkit ? 'webkitTransitionEnd' :
+                                    'transitionend', ng_onCurrentForwards);
+        switch (dataPosition) {
+          case 'bottom':
+            current.setAttribute('data-position', 'up');
+            break;
+          case 'right':
+            current.setAttribute('data-position', 'left');
+            break;
+        }
+        current.classList.remove(forwardsClasses.current);
+      };
+      current.addEventListener(isWebkit ? 'webkitTransitionEnd' : 'transitionend',
+                               onCurrentForwards);
+      waitForTransition(current, callback);
     }
 
     // Add forwards class to next view.
     if (forwardsClasses.next) {
       next.classList.add(forwardsClasses.next);
-      waitForAnimation(next, callback);
+      var onNextForwards = function ng_onNextForwards() {
+        next.removeEventListener(isWebkit ? 'webkitTransitionEnd' :
+                                    'transitionend', ng_onNextForwards);
+        next.setAttribute('data-position', 'current');
+        next.classList.remove(forwardsClasses.next);
+      };
+      next.addEventListener(isWebkit ? 'webkitTransitionEnd' : 'transitionend',
+                               onNextForwards);
+      waitForTransition(next, callback);
     }
 
     var zIndex = stack[stack.length - 1].zIndex + 1;
-    stack.push({ view: nextView, animation: animation, zIndex: zIndex});
+    stack.push({ view: nextView, transition: transition, zIndex: zIndex});
     next.style.zIndex = zIndex;
     _currentView = nextView;
   };
@@ -153,35 +178,39 @@ utils.navigation = (function() {
     }
 
     var currentView = stack.pop();
-    var current = document.querySelector(currentView.view);
+    var current = currentView.view;
     var currentClassList = current.classList;
 
     var nextView = stack[stack.length - 1];
-    var animation = currentView.animation;
-
-    var forwardsClasses = animations[animation].forwards;
-    var backwardsClasses = animations[animation].backwards;
+    var transition = currentView.transition;
+    
+    var forwardsClasses = transitions[transition].forwards;
+    var backwardsClasses = transitions[transition].backwards;
 
     // Add backwards class to current view.
     if (backwardsClasses.current) {
       currentClassList.add(backwardsClasses.current);
-      waitForAnimation(current, callback);
+      waitForTransition(current, callback);
       var onCurrentBackwards = function ng_onCurrentBackwards() {
-        current.removeEventListener(isWebkit ? 'webkitAnimationEnd' :
-                                    'animationend', ng_onCurrentBackwards);
-        // Once the backwards animation completes, delete the added classes
-        // to restore the elements to their initial state.
-        currentClassList.remove(forwardsClasses.next);
+        current.removeEventListener(isWebkit ? 'webkitTransitionEnd' :
+                                    'transitionend', ng_onCurrentBackwards);
+        if (transition.indexOf('right') !== -1) {
+          current.setAttribute('data-position', 'right'); 
+        } else if (transition.indexOf('bottom') !== -1) {
+          current.setAttribute('data-position', 'bottom'); 
+        } else if (transition.indexOf('back') !== -1) {
+          current.setAttribute('data-position', 'back'); 
+        }
         currentClassList.remove(backwardsClasses.current);
         current.style.zIndex = null;
       };
-      current.addEventListener(isWebkit ? 'webkitAnimationEnd' : 'animationend',
+      current.addEventListener(isWebkit ? 'webkitTransitionEnd' : 'transitionend',
                                onCurrentBackwards);
     } else {
       current.style.zIndex = null;
     }
 
-    var next = document.querySelector(nextView.view);
+    var next = nextView.view;
     var nextClassList = next.classList;
 
     next.style.zIndex = nextView.zIndex;
@@ -189,16 +218,14 @@ utils.navigation = (function() {
     // Add backwards class to next view.
     if (backwardsClasses.next) {
       nextClassList.add(backwardsClasses.next);
-      waitForAnimation(next, callback);
+      waitForTransition(next, callback);
       var onNextBackwards = function ng_onNextBackwards() {
-        next.removeEventListener(isWebkit ? 'webkitAnimationEnd' :
-                                 'animationend', ng_onNextBackwards);
-        // Once the backwards animation completes, delete the added classes
-          // to restore the elements to their initial state.
-        nextClassList.remove(forwardsClasses.current);
+        next.removeEventListener(isWebkit ? 'webkitTransitionEnd' :
+                                 'transitionend', ng_onNextBackwards);
+        next.setAttribute('data-position', 'current'); 
         nextClassList.remove(backwardsClasses.next);
       };
-      next.addEventListener(isWebkit ? 'webkitAnimationEnd' : 'animationend',
+      next.addEventListener(isWebkit ? 'webkitTransitionEnd' : 'transitionend',
                             onNextBackwards);
     }
 
@@ -222,7 +249,7 @@ utils.navigation = (function() {
    * Returns the current view, this is the section currently visible.
    */
   var getCurrentView = function ng_getCurrentView() {
-    return document.querySelector(_currentView);
+    return _currentView;
   };
 
   return {

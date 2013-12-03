@@ -10,6 +10,8 @@ function init() {
   );
   document.getElementById('back-fade-back-action').addEventListener('click',
     back);
+  document.getElementById('back-fade-home-action').addEventListener('click',
+    home);
   
   document.getElementById('bottom-push-action').addEventListener('click', 
     function bottomPushAction(evt) {
@@ -18,6 +20,8 @@ function init() {
   );
   document.getElementById('bottom-push-back-action').addEventListener('click',
     back);
+  document.getElementById('bottom-push-home-action').addEventListener('click',
+    home);
   
   document.getElementById('bottom-slide-action').addEventListener('click', 
     function bottomSlideAction(evt) {
@@ -26,6 +30,8 @@ function init() {
   );
   document.getElementById('bottom-slide-back-action').addEventListener('click',
     back);
+  document.getElementById('bottom-slide-home-action').addEventListener('click',
+    home);
   
   document.getElementById('right-push-action').addEventListener('click', 
     function rightPushAction(evt) {
@@ -34,6 +40,8 @@ function init() {
   );
   document.getElementById('right-push-back-action').addEventListener('click',
     back);
+  document.getElementById('right-push-home-action').addEventListener('click',
+    home);
   
   document.getElementById('right-slide-action').addEventListener('click', 
     function rightSlideAction(evt) {
@@ -42,16 +50,20 @@ function init() {
   );
   document.getElementById('right-slide-back-action').addEventListener('click',
     back);
+  document.getElementById('right-slide-home-action').addEventListener('click',
+    home);
   
   document.getElementById('sequence-action').addEventListener('click',
     function (evt) {
-//      utils.navigation.go('#bottom-push', function showBottomSlide() {
-        utils.navigation.go('#bottom-slide', function showRightPush() {
-          utils.navigation.go('#right-push', function showRightSlide() {
-            utils.navigation.go('#right-slide');
+      utils.navigation.go('#back-fade', function showBottomPush() {
+        utils.navigation.go('#bottom-push', function showBottomSlide() {
+          utils.navigation.go('#bottom-slide', function showRightPush() {
+            utils.navigation.go('#right-push', function showRightSlide() {
+              utils.navigation.go('#right-slide');
+            });
           });
         });
-//      });
+      });
     }
   );
 }
@@ -62,4 +74,8 @@ function animationEnded() {
 
 function back() {
   utils.navigation.back(animationEnded);
+}
+
+function home() {
+  utils.navigation.home();
 }
