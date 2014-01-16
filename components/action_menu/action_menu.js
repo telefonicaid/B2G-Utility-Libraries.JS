@@ -190,11 +190,9 @@ utils.ActionMenu = (function() {
       form.id = descriptor.id;
     }
 
-    var section = document.createElement('section');
-    var h1 = document.createElement('h1');
-    h1.textContent = descriptor.title || '';
-    section.appendChild(h1);
-    form.appendChild(section);
+    var header = document.createElement('header');
+    header.textContent = descriptor.title || '';
+    form.appendChild(header);
 
     var actions = descriptor.actions;
     if (actions) {
