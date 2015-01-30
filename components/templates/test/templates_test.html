@@ -40,20 +40,33 @@
 
     <section id="test_section" style="display: none">
       <ol id="test">
-        <li id="#id#" data-template>#data#</li>
+        <template>
+          <li data-unknown="#unknowndata#">#data#</li>
+        </template>
       </ol>
 
       <ol id="test2">
-        <li id="#data.id#" data-template>#data.data#</li>
+        <template>
+          <li id="#data.id#">#data.data#</li>
+        </template>
       </ol>
 
       <ol id="test21">
-        <li id="#data.id#" data-template>#data.dataFunction.data#</li>
+        <template>
+          <li id="#data.id#" data-other="#dataFunction2#">#data.dataFunction.data#</li>
+        </template>
       </ol>
 
       <ol id="test3">
-        <li id="#id#" data-template data-condition="condition.displayRow0">Row 0</li>
-        <li id="#id#" data-template data-condition="condition.displayRow1">Row 1</li>
+        <template data-condition="condition.displayRow0">
+          <li id="#id#">Row 0</li>
+        </template>
+        <template data-condition="condition.displayRow1">
+          <li id="#id#">Row 1</li>
+        </template>
+        <template>
+           <li id="#id#">Default Row</li>
+        </template>
       </ol>
     </section>
     <div id="coverage"></div>
