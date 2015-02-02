@@ -107,7 +107,7 @@ suite('Test Templates', function() {
           id: 'id_function',
           dataFunction: function() {
             return {
-                      data: 'Data Function'
+              data: 'Data Function'
             };
           }
         }
@@ -149,7 +149,7 @@ suite('Test Templates', function() {
     assert.equal(l2.parentNode.firstChild, l2);
 
     // Unknown data leaves the template as it is
-    assert.equal(l2.dataset.unknown,'#unknowndata#');
+    assert.equal(l2.dataset.unknown,'${unknowndata}');
 
     var l1 = document.getElementById('id1');
     assert.equal(l2.nextSibling, l1);
