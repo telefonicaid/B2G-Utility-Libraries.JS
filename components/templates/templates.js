@@ -17,8 +17,8 @@
  *    <template>
  *     <li>
  *      <dl>
- *         <dt>#name#</dt>
- *         <dd class="img"><img src="#contactImg#"></dd>
+ *         <dt>${name}</dt>
+ *         <dd class="img"><img src="${contactImg}"></dd>
  *      </dl>
  *     </li>
  *    </template>
@@ -288,7 +288,7 @@ if (!utils.templates) {
       // Replace function
       var replaceFunction = templateReplace(data);
 
-      var pattern = /#(\w+[\w.]*)#/g;
+      var pattern = /\$\{([^}]+)\}/g;
       var ninner = inner.replace(pattern, replaceFunction);
 
       newElem.innerHTML = ninner;

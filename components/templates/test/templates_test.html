@@ -41,31 +41,31 @@
     <section id="test_section" style="display: none">
       <ol id="test">
         <template>
-          <li data-unknown="#unknowndata#">#data#</li>
+          <li data-unknown="${unknowndata}">${data}</li>
         </template>
       </ol>
 
       <ol id="test2">
         <template>
-          <li id="#data.id#">#data.data#</li>
+          <li id="${data.id}">${data.data}</li>
         </template>
       </ol>
 
       <ol id="test21">
         <template>
-          <li id="#data.id#" data-other="#dataFunction2#">#data.dataFunction.data#</li>
+          <li id="${data.id}" data-other="${dataFunction2}">${data.dataFunction.data}</li>
         </template>
       </ol>
 
       <ol id="test3">
         <template data-condition="condition.displayRow0">
-          <li id="#id#">Row 0</li>
+          <li id="${id}">Row 0</li>
         </template>
         <template data-condition="condition.displayRow1">
-          <li id="#id#">Row 1</li>
+          <li id="${id}">Row 1</li>
         </template>
         <template>
-           <li id="#id#">Default Row</li>
+           <li id="${id}">Default Row</li>
         </template>
       </ol>
     </section>
