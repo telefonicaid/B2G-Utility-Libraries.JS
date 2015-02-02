@@ -3,23 +3,25 @@
  *
  *  Product: Open Web Device
  *
- *  Copyright(c) 2012 Telefónica I+D S.A.U.
+ *  Copyright(c) 2015 Telefónica I+D S.A.U.
  *
  *  LICENSE: Apache 2.0
  *
- *  @author Telefonica Digital
+ *  @author Open Web Devices Team @ Telefónica
  *
  *  The module allows to work with HTML templates in client-side JS environments
  *
  *  @example
  *
  *   <ul id="theList">
- *    <li data-template>
+ *    <template>
+ *     <li>
  *      <dl>
  *         <dt>#name#</dt>
  *         <dd class="img"><img src="#contactImg#"></dd>
  *      </dl>
- *    </li>
+ *     </li>
+ *    </template>
  *   </ul>
  *
  *   var myObj = { name: 'Nice Name!', contactImg: 'myImg.jpg' };
@@ -33,6 +35,8 @@ var utils = window.utils || {};
 if (!utils.templates) {
   (function() {
     var Templates = utils.templates = {};
+
+    const TEMPLATE_SELECTOR = 'template';
 
     /**
      *  Returns a target HTMLElement from a selector or HTMLElement itself
@@ -64,7 +68,7 @@ if (!utils.templates) {
     */
     function getTemplate(target, data) {
       var template;
-      var templates = target.querySelectorAll('*[data-template]');
+      var templates = target.querySelectorAll(TEMPLATE_SELECTOR);
 
       var total = templates.length;
 
@@ -73,41 +77,23 @@ if (!utils.templates) {
         multi = true;
       }
 
-      if (total > 0) {
-        var condition = templates.item(0).dataset.condition;
+      var evaluation;
 
-        // If the first has no condition it will be selected by default
-        // The most frequent case will be that the first is the one that wins
-        if (!condition) {
-           template = templates.item(0);
-        }
+      for (var c = 0; c < total; c++) {
+        var condition = templates.item(c).dataset.condition;
 
-        var evaluation;
         if (condition) {
           evaluation = get(data, condition);
           if (evaluation) {
-            // The rest will be ignored
-            total = 1;
-            template = templates.item(0);
-          }
-        }
-
-        for (var c = 1; c < total; c++) {
-          var condition = templates.item(c).dataset.condition;
-
-          if (condition) {
-            evaluation = get(data, condition);
-            if (evaluation) {
-              template = templates.item(c);
-              break;
-            }
-          } else if (!template) {
-            // Just to be sure that if there is no a condition
-            // something will be selected
             template = templates.item(c);
+            break;
           }
-        } // Iteration trying to find a template
-      } // total templates > 0
+        } else {
+          // Just to be sure that if there is no a condition
+          // something will be selected
+          template = templates.item(c);
+        }
+      } // Iteration trying to find a template
 
       return {template: template, isMulti: multi};
     }
@@ -122,11 +108,11 @@ if (!utils.templates) {
      */
     function templateReplace(data) {
       return function(text, property) {
-        var ret = get(data, property);
-        if (typeof ret === 'undefined') {
-          ret = text;
+        var out = get(data, property);
+        if (typeof out === 'undefined') {
+          out = text;
         }
-        return ret;
+        return out;
       }
     }
 
@@ -143,28 +129,27 @@ if (!utils.templates) {
      */
     function get(data, path) {
 
-      function doGet(data, fields) {
-        var ret;
+      function doGet(pdata, fields) {
+        var out;
+        var data = pdata;
+        if (typeof pdata === 'function') {
+          data = pdata();
+        }
+
         // Base case: goal reached
         if (fields.length === 0) {
-          if (typeof data === 'function') {
-            ret = data();
-          }
-          else {
-            ret = data;
-          }
-
+          out = data;
         // Recursive case: access the field and look into
         } else if (data !== null && typeof data !== 'undefined') {
           var field = fields.shift();
           if (typeof data[field] === 'function') {
-            ret = doGet(data[field](), fields);
+            out = doGet(data[field](), fields);
           }
           else {
-            ret = doGet(data[field], fields);
+            out = doGet(data[field], fields);
           }
         }
-        return ret;
+        return out;
       }
 
       var fieldList = path.split('.');
@@ -296,17 +281,14 @@ if (!utils.templates) {
      *
      */
     Templates.render = function(eleTemplate, data) {
-      var newElem = eleTemplate.cloneNode(true);
-      newElem.removeAttribute('data-template');
-      newElem.removeAttribute('data-condition');
-
-      /* var pattern = /#(\w+)#/g; */
-      var pattern = /#(\w+[\w.]*)#/g;
-
+      var newElem = document.importNode(eleTemplate.content.firstElementChild,
+                                        true);
       var inner = newElem.innerHTML;
 
       // Replace function
       var replaceFunction = templateReplace(data);
+
+      var pattern = /#(\w+[\w.]*)#/g;
       var ninner = inner.replace(pattern, replaceFunction);
 
       newElem.innerHTML = ninner;
@@ -339,13 +321,11 @@ if (!utils.templates) {
      */
     Templates.clear = function(element) {
       var target = getTarget(element);
-
-      var templates = target.querySelectorAll('*[data-template]');
+      var templates = target.querySelectorAll(TEMPLATE_SELECTOR);
 
       target.innerHTML = '';
 
       var total = templates.length;
-
       for (var c = 0; c < total; c++) {
         target.appendChild(templates.item(c));
       }

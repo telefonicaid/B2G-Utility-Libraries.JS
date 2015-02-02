@@ -4,11 +4,11 @@ suite('Test Templates', function() {
     var ols = document.querySelectorAll('#test_section > ol');
     for (var j = 0; j < ols.length; j++) {
       var ol = ols.item(j);
-      var templateLis = ol.querySelectorAll('[data-template]');
+      var templateList = ol.querySelectorAll('template');
 
       ol.innerHTML = '';
-      for (var k = 0; k < templateLis.length; k++) {
-        ol.appendChild(templateLis.item(k));
+      for (var k = 0; k < templateList.length; k++) {
+        ol.appendChild(templateList.item(k));
       }
     }
   }
@@ -98,13 +98,18 @@ suite('Test Templates', function() {
 
   test('Template > Append > Function Data', function() {
 
-    var data = {
-      data: {
-        id: 'id_function',
-        dataFunction: function() {
-          return {
-                    data: 'Data Function'
-          };
+    var data = function() {
+      return {
+        dataFunction2: function() {
+          return 'Data Function 2';
+        },
+        data: {
+          id: 'id_function',
+          dataFunction: function() {
+            return {
+                      data: 'Data Function'
+            };
+          }
         }
       }
     };
@@ -113,6 +118,7 @@ suite('Test Templates', function() {
 
     var l1 = document.getElementById('id_function');
     assert.equal(l1.textContent, 'Data Function');
+    assert.equal(l1.dataset.other, 'Data Function 2');
 
     var target = document.getElementById('test21');
 
@@ -142,10 +148,13 @@ suite('Test Templates', function() {
     var l2 = document.getElementById('id2');
     assert.equal(l2.parentNode.firstChild, l2);
 
+    // Unknown data leaves the template as it is
+    assert.equal(l2.dataset.unknown,'#unknowndata#');
+
     var l1 = document.getElementById('id1');
     assert.equal(l2.nextSibling, l1);
 
-    // // The template + the added elements
+    // The template + the added elements
     assert.equal(target.children.length, 3);
 
     assertPrepend(target, l2);
@@ -171,8 +180,8 @@ suite('Test Templates', function() {
     var li = document.getElementById('123abcdef');
     assert.equal(li.textContent, 'Row 0');
 
-    // Two from template + one rendered
-    assert.equal(target.children.length, 3);
+    // Three from template + one rendered
+    assert.equal(target.children.length, 4);
 
     assertAppend(target, li);
   });
@@ -194,38 +203,39 @@ suite('Test Templates', function() {
     var li = document.getElementById('123abcdef');
     assert.equal(li.textContent, 'Row 1');
 
-    // Two from template + one rendered
-    assert.equal(target.children.length, 3);
+    // Three from template + one rendered
+    assert.equal(target.children.length, 4);
 
     assertAppend(target, li);
   });
 
 
-  test('Template > Append > Condition over data > First met. Second ignored', function() {
+  test('Template > Append > Condition over data > First met. Second ignored',
+    function() {
 
-    var data = {
-      id: '123abcdef',
-      condition: {
-        displayRow0: function() {
-          return true;
-        },
-        displayRow1: function() {
-          return true;
+      var data = {
+        id: '123abcdef',
+        condition: {
+          displayRow0: function() {
+            return true;
+          },
+          displayRow1: function() {
+            return true;
+          }
         }
-      }
-    };
+      };
 
-    utils.templates.append('#test3', data);
+      utils.templates.append('#test3', data);
 
-    var target = document.getElementById('test3');
+      var target = document.getElementById('test3');
 
-    var li = document.getElementById('123abcdef');
-    assert.equal(li.textContent, 'Row 0');
+      var li = document.getElementById('123abcdef');
+      assert.equal(li.textContent, 'Row 0');
 
-    // Two from template + one rendered
-    assert.equal(target.children.length, 3);
+      // Three from template + one rendered
+      assert.equal(target.children.length, 4);
 
-    assertAppend(target, li);
+      assertAppend(target, li);
   });
 
   test('Template > Prepend Array > Condition over data', function() {
@@ -257,12 +267,30 @@ suite('Test Templates', function() {
     var l2 = document.getElementById('fgh789');
     assert.equal(l2.textContent, 'Row 1');
 
-    // Two from template + two rendered
-    assert.equal(target.children.length, 4);
+    // Three from template + two rendered
+    assert.equal(target.children.length, 5);
 
     // Check that prepend was actually done
     assertPrepend(target, l2);
     assert.equal(l2.nextSibling, l1);
+  });
+
+  test('Template > If no condition matches default is taken', function() {
+    var data = {
+      id: 'noMatches'
+    };
+
+    utils.templates.append('#test3', data);
+    var l1 = document.getElementById('noMatches');
+    assert.equal(l1.textContent, 'Default Row');
+  });
+
+  test('Template > Clear', function() {
+    utils.templates.clear('#test3');
+
+    var target = document.getElementById('test3');
+
+    assert.equal(target.querySelectorAll('template').length, 3);
   });
 
 });
