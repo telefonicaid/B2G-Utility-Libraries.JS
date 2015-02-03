@@ -21,6 +21,16 @@ suite('Test Templates', function() {
     assert.equal(container.firstElementChild, child);
   }
 
+  // Asserts the number of elements taking into account templates
+  function assertNumElements(target, numRendered, numTemplates) {
+    var numToAssert = numRendered;
+    if (!HTMLTemplateElement || !document.registerElement) {
+      numToAssert += numTemplates;
+    }
+
+    assert.equal(target.children.length, numToAssert);
+  }
+
   setup(function() {
     resetLists();
   });
@@ -39,8 +49,7 @@ suite('Test Templates', function() {
     var l1 = document.getElementById('id1');
     assert.equal(l1.textContent, 'Data 1');
 
-    // The template + the added element
-    assert.equal(target.children.length, 2);
+    assertNumElements(target, 1, 1);
     assertAppend(target, l1);
   });
 
@@ -67,8 +76,7 @@ suite('Test Templates', function() {
 
     var target = document.getElementById('test');
 
-    // The template + the added elements
-    assert.equal(target.children.length, 3);
+    assertNumElements(target, 2, 1);
 
     assertAppend(target, l2);
     assert.equal(l1.nextElementSibling, l2);
@@ -90,8 +98,7 @@ suite('Test Templates', function() {
 
     var target = document.getElementById('test2');
 
-    // The template + the added element
-    assert.equal(target.children.length, 2);
+    assertNumElements(target, 1, 1);
 
     assertAppend(target, l1);
   });
@@ -122,8 +129,7 @@ suite('Test Templates', function() {
 
     var target = document.getElementById('test21');
 
-    // The template + the added element
-    assert.equal(target.children.length, 2);
+    assertNumElements(target, 1, 1);
 
     assertAppend(target, l1);
   });
@@ -154,8 +160,7 @@ suite('Test Templates', function() {
     var l1 = document.getElementById('id1');
     assert.equal(l2.nextSibling, l1);
 
-    // The template + the added elements
-    assert.equal(target.children.length, 3);
+    assertNumElements(target, 2, 1);
 
     assertPrepend(target, l2);
     assert.equal(l2.nextElementSibling, l1);
@@ -180,8 +185,7 @@ suite('Test Templates', function() {
     var li = document.getElementById('123abcdef');
     assert.equal(li.textContent, 'Row 0');
 
-    // Three from template + one rendered
-    assert.equal(target.children.length, 4);
+    assertNumElements(target, 1, 3);
 
     assertAppend(target, li);
   });
@@ -203,8 +207,7 @@ suite('Test Templates', function() {
     var li = document.getElementById('123abcdef');
     assert.equal(li.textContent, 'Row 1');
 
-    // Three from template + one rendered
-    assert.equal(target.children.length, 4);
+    assertNumElements(target, 1, 3);
 
     assertAppend(target, li);
   });
@@ -232,8 +235,8 @@ suite('Test Templates', function() {
       var li = document.getElementById('123abcdef');
       assert.equal(li.textContent, 'Row 0');
 
-      // Three from template + one rendered
-      assert.equal(target.children.length, 4);
+      // one rendered
+     assertNumElements(target, 1, 3);
 
       assertAppend(target, li);
   });
@@ -267,8 +270,8 @@ suite('Test Templates', function() {
     var l2 = document.getElementById('fgh789');
     assert.equal(l2.textContent, 'Row 1');
 
-    // Three from template + two rendered
-    assert.equal(target.children.length, 5);
+    // Two rendered
+    assertNumElements(target, 2, 3);
 
     // Check that prepend was actually done
     assertPrepend(target, l2);
@@ -283,6 +286,31 @@ suite('Test Templates', function() {
     utils.templates.append('#test3', data);
     var l1 = document.getElementById('noMatches');
     assert.equal(l1.textContent, 'Default Row');
+
+    var target = document.getElementById('test3');
+    assertNumElements(target, 1, 3);
+  });
+
+  test('Template > without x-template > consumes DOM', function() {
+    var data = {
+      data: {
+        id: 'id-x-template',
+        data: 'Data 4'
+      }
+    };
+
+    utils.templates.append('#test4', data);
+
+    var l1 = document.getElementById('id-x-template');
+    assert.equal(l1.textContent, 'Data 4');
+
+    var target = document.getElementById('test4');
+
+    // The template appears
+    assert.equal(target.children.length, 2);
+
+    // The element has been rendered
+    assertAppend(target, l1);
   });
 
   test('Template > Clear', function() {
@@ -290,7 +318,7 @@ suite('Test Templates', function() {
 
     var target = document.getElementById('test3');
 
-    assert.equal(target.querySelectorAll('template').length, 3);
+    assertNumElements(target, 0, 3);
   });
 
 });

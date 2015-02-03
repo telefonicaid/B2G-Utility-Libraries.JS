@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="../../../test_infra/vendor/jscovreporter_custom/reporter.css">
   </head>
   <body>
+    <!--
+      Uncomment this line to simulate environments without WebComponents support
+      <script>document.registerElement = null;</script>
+    -->
     <div id="mocha"></div>
     <script src="../../../test_infra/vendor/mocha/mocha.js"></script>
     <script src="../../../test_infra/vendor/chai/chai.js"></script>
@@ -20,14 +24,7 @@
     <script src="../../../test_infra/vendor/jscovreporter/JSCovReporter.js"></script>
 
     <script>mocha.setup('tdd'); window.assert = window.chai.assert;</script>
-    <script src="../templates.js"></script>
     <script src="templates_test.js"></script>
-
-    <script>
-      // We need this for the js coverage
-      utils.templates = null;
-    </script>
-
     <script src="../instrumented/templates.js"></script>
 
     <script>
@@ -40,34 +37,41 @@
 
     <section id="test_section" style="display: none">
       <ol id="test">
-        <template>
+        <template is="x-template">
           <li data-unknown="${unknowndata}">${data}</li>
         </template>
       </ol>
 
       <ol id="test2">
-        <template>
+        <template is="x-template">
           <li id="${data.id}">${data.data}</li>
         </template>
       </ol>
 
       <ol id="test21">
-        <template>
+        <template is="x-template">
           <li id="${data.id}" data-other="${dataFunction2}">${data.dataFunction.data}</li>
         </template>
       </ol>
 
       <ol id="test3">
-        <template data-condition="condition.displayRow0">
+        <template data-condition="condition.displayRow0" is="x-template">
           <li id="${id}">Row 0</li>
         </template>
-        <template data-condition="condition.displayRow1">
+        <template data-condition="condition.displayRow1" is="x-template">
           <li id="${id}">Row 1</li>
         </template>
-        <template>
+        <template is="x-template">
            <li id="${id}">Default Row</li>
         </template>
       </ol>
+
+      <ol id="test4">
+        <template>
+          <li id="${data.id}">${data.data}</li>
+        </template>
+      </ol>
+
     </section>
     <div id="coverage"></div>
     <div id="menu"></div>

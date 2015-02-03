@@ -1,20 +1,20 @@
 /*
  *  Module: Templates
  *
- *  Product: Open Web Device
+ *  Product: Utility Libraries for Web front-end development
  *
  *  Copyright(c) 2015 Telefónica I+D S.A.U.
  *
  *  LICENSE: Apache 2.0
  *
- *  @author Open Web Devices Team @ Telefónica
+ *  @author Web Browser Community @ Telefónica I+D
  *
  *  The module allows to work with HTML templates in client-side JS environments
  *
  *  @example
  *
  *   <ul id="theList">
- *    <template>
+ *    <template is="x-template">
  *     <li>
  *      <dl>
  *         <dt>${name}</dt>
@@ -27,6 +27,17 @@
  *   var myObj = { name: 'Nice Name!', contactImg: 'myImg.jpg' };
  *   utils.templates.append('#theList',myObj);
  *
+ *   DISCLAIMERS:
+ *
+ *   The <template> element will be the first child element of the container
+ *   in the following situations:
+ *
+ *     A/ in browsers which do not implement Web Components
+ *
+ *     B/ If the template is not tagged as an 'x-template'
+ *
+ *     C/ If this library is loaded with <script defer>
+ *
  */
 
 
@@ -36,7 +47,56 @@ if (!utils.templates) {
   (function() {
     var Templates = utils.templates = {};
 
+    // Template selector
     const TEMPLATE_SELECTOR = 'template';
+
+    /**
+     *  Registers the x-template Web Component if Web Components if they are
+     *  available
+     *
+     */
+    function registerComponent() {
+      if (!HTMLTemplateElement || !document.registerElement) {
+        console.warn('Web Components not available. Templates consume DOM');
+        return;
+      }
+
+      var xTemplateProto = Object.create(HTMLTemplateElement.prototype);
+
+      // When an 'x-template' is attached the element in the DOM is destroyed
+      // and moved to the Shadow DOM
+      xTemplateProto.attachedCallback = function() {
+        var parent = this.parentElement;
+
+        if (!parent) {
+          console.warn('Parent Element not avilable for: ', this);
+          return;
+        }
+
+        // We reuse an existing shadowRoot if it already contains a template
+        var shadow = parent.shadowRoot;
+        if (!shadow || !shadow.querySelector(TEMPLATE_SELECTOR)) {
+          shadow = parent.createShadowRoot();
+        }
+
+        var internalTemplate = document.createElement(TEMPLATE_SELECTOR);
+        internalTemplate.content.appendChild(document.importNode(
+                                      this.content.firstElementChild, true));
+        // We need to copy all the data attributes to the internal template
+        for (var prop in this.dataset) {
+          internalTemplate.dataset[prop] = this.dataset[prop];
+        }
+
+        shadow.appendChild(internalTemplate);
+
+        parent.removeChild(this);
+      }
+
+      document.registerElement('x-template', {
+        prototype: xTemplateProto,
+        extends: 'template'
+      });
+    }
 
     /**
      *  Returns a target HTMLElement from a selector or HTMLElement itself
@@ -68,7 +128,14 @@ if (!utils.templates) {
     */
     function getTemplate(target, data) {
       var template;
+
       var templates = target.querySelectorAll(TEMPLATE_SELECTOR);
+
+      // If there are no templates in the regular DOM let's try to find them
+      // in the shadowRoot
+      if (templates.length === 0 && target.shadowRoot) {
+        templates = target.shadowRoot.querySelectorAll(TEMPLATE_SELECTOR);
+      }
 
       var total = templates.length;
 
@@ -330,5 +397,9 @@ if (!utils.templates) {
         target.appendChild(templates.item(c));
       }
     };
+
+    // The x-template Web Component is registered
+    registerComponent();
+
   }) ();
 } // window.templates
